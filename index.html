@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JJK Idle - Combat Edition</title>
+<style>
+:root {
+  --bg-color: #0d0d12;
+  --panel-bg: rgba(26, 26, 34, 0.85);
+  --panel-border: rgba(106, 0, 255, 0.4);
+  --text-main: #e0e0e0;
+  --text-muted: #888;
+  --accent: #6a00ff;
+  --accent-hover: #8a2be2;
+  --health-bg: #222;
+  --health-bar: #ff2a55;
+  --player-hp-bar: #33cc66;
+  --cursed-red: #ff3366;
+  --yen-gold: #ffd700;
+}
+
+body {
+  background: var(--bg-color) radial-gradient(circle at center, #1a1a2e 0%, #0d0d12 100%);
+  color: var(--text-main);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  overflow-x: hidden;
+  transition: background 1s ease;
+}
+
+.bg-stage-0 { background: #0d0d12 radial-gradient(circle at center, #1a1a2e 0%, #0d0d12 100%) !important; }
+.bg-stage-1 { background: #1a0a0a radial-gradient(circle at center, #331111 0%, #0d0d12 100%) !important; }
+.bg-stage-2 { background: #0a1a0f radial-gradient(circle at center, #113322 0%, #0d0d12 100%) !important; }
+.bg-stage-3 { background: #1a1a1a radial-gradient(circle at center, #444 0%, #0d0d12 100%) !important; }
+.bg-stage-4 { background: #220022 radial-gradient(circle at center, #441144 0%, #0d0d12 100%) !important; }
+
+h1 { text-align: center; color: #fff; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px var(--accent); margin-bottom: 20px; }
+
+.dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
+
+.panel {
+  background: var(--panel-bg); backdrop-filter: blur(8px); padding: 20px;
+  border-radius: 12px; border: 1px solid var(--panel-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  display: flex; flex-direction: column;
+}
+
+.panel h2, .panel h3 { margin-top: 0; border-bottom: 2px solid var(--panel-border); padding-bottom: 10px; color: #fff; }
+p { margin: 8px 0; font-size: 14px; }
+.stat-value { font-weight: bold; color: #fff; }
+
+button {
+  background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;
+  font-weight: bold; transition: all 0.2s; margin: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+button:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(138, 43, 226, 0.5); }
+button:active:not(:disabled) { transform: translateY(0); }
+button:disabled { background: #444; color: #888; cursor: not-allowed; text-shadow: none; box-shadow: none; }
+
+.main-clicker {
+  width: calc(100% - 10px); padding: 15px; font-size: 18px;
+  background: linear-gradient(45deg, #4b0082, #6a00ff); border: 2px solid #8a2be2; box-shadow: 0 0 15px rgba(106, 0, 255, 0.4);
+}
+.main-clicker:hover:not(:disabled) { background: linear-gradient(45deg, #6a00ff, #8a2be2); box-shadow: 0 0 25px rgba(138, 43, 226, 0.6); }
+
+.health-bar-container { margin: 15px 0; }
+.health-bar { background: var(--health-bg); border-radius: 8px; overflow: hidden; height: 25px; width: 100%; position: relative; border: 1px solid #111; box-shadow: inset 0 2px 5px rgba(0,0,0,0.7); }
+.health-bar-inner { background: linear-gradient(90deg, #990022, var(--health-bar)); height: 100%; width: 100%; transition: width 0.15s ease-out; }
+.player-hp-inner { background: linear-gradient(90deg, #006622, var(--player-hp-bar)); height: 100%; width: 100%; transition: width 0.15s ease-out; }
+.health-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 13px; font-weight: bold; text-shadow: 1px 1px 2px #000; pointer-events: none; color: white; }
+#enemyNameDisplay { font-weight: bold; font-size: 18px; color: var(--cursed-red); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+#enemyLevel { font-size: 12px; color: #aaa; margin-left: 10px; }
+
+.combat-log { height: 120px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 6px; overflow-y: auto; padding: 10px; font-family: monospace; font-size: 12px; margin-top: 10px; display: flex; flex-direction: column-reverse; }
+.log-p { color: #88ff88; margin: 2px 0; }
+.log-e { color: #ff8888; margin: 2px 0; }
+.log-sys { color: #ffff88; margin: 2px 0; }
+
+.skill-btn { background: #2a2a35; border: 1px solid var(--accent); padding: 10px; width: calc(50% - 14px); position: relative; overflow: hidden; }
+.skill-cooldown { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--yen-gold); width: 0%; transition: width 0.1s linear; }
+
+.upgrade-card { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); border-left: 4px solid var(--cursed-red); padding: 12px; border-radius: 6px; margin-bottom: 10px; transition: background 0.2s; }
+.upgrade-card:hover { background: rgba(0,0,0,0.6); }
+.upgrade-btn { background: #2a2a35; border: 1px solid #444; padding: 8px 12px; min-width: 110px; }
+.upgrade-btn:hover:not(:disabled) { border-color: var(--yen-gold); background: #3a3a4a; }
+
+.chances-list { font-size: 12px; color: var(--text-muted); max-height: 130px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; margin-top: 5px; border: 1px solid #333; }
+.chances-list p { margin: 3px 0; display:flex; justify-content:space-between; }
+.text-common { color: #aaaaaa; }
+.text-rare { color: #4da6ff; text-shadow: 0 0 4px rgba(77, 166, 255, 0.4); }
+.text-epic { color: #b366ff; text-shadow: 0 0 4px rgba(179, 102, 255, 0.4); }
+.text-legendary { color: #ffcc00; text-shadow: 0 0 6px rgba(255, 204, 0, 0.6); margin-bottom:-4px;}
+.text-mythic { background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 5px rgba(255,255,255,0.3); font-weight: bold; background-size: 200% auto; animation: rainbow 3s linear infinite; }
+@keyframes rainbow { to { background-position: 200% center; } }
+.text-secret { background: linear-gradient(135deg, #000, #ff0000, #000); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 10px #ff0000; font-weight: bold; letter-spacing: 2px; background-size: 200% auto; animation: secretPulse 2s ease-in-out infinite alternate; }
+@keyframes secretPulse { to { background-position: 100% center; } }
+.text-tss { background: linear-gradient(90deg, #ff9999, #ffffff, #ff9999); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 12px rgba(255,153,153,0.8); font-weight: bold; background-size: 200% auto; animation: tssPulse 2s linear infinite; font-size: 1.1em; }
+@keyframes tssPulse { to { background-position: 200% center; } }
+
+.gacha-tabs { display: flex; margin-bottom: 10px; border-bottom: 2px solid #333; }
+.gacha-tab { flex: 1; background: transparent; color: #888; border-radius: 6px 6px 0 0; margin: 0; padding: 10px; font-size: 13px; }
+.gacha-tab.active { color: #fff; border-bottom: 2px solid var(--accent); background: rgba(255,255,255,0.05); }
+.gacha-content { display: none; }
+.gacha-content.active { display: block; }
+
+.pity-text { font-size:11px; text-align:center; margin-bottom:10px; color:#aaa; font-family:monospace; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 4px; border: 1px solid #333;}
+
+#popup-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+.damage-popup { position: absolute; font-weight: bold; animation: floatUp 0.8s ease-out forwards; pointer-events: none; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; }
+@keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.2); } 100% { opacity: 0; transform: translateY(-60px) scale(0.8); } }
+
+.shake { animation: bossShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+@keyframes bossShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+
+.black-flash-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index:900; animation: flashBang 0.2s ease-out forwards; pointer-events: none; }
+@keyframes flashBang { 0% { opacity: 0.8; } 100% { opacity: 0; display: none; } }
+
+.rct-btn { background: linear-gradient(135deg, #004411, #008822); border: 1px solid #55ff55; color: white; width: calc(100% - 10px); padding: 6px; font-size:11px; box-shadow: 0 0 10px rgba(0,255,0,0.2); }
+.rct-btn:hover:not(:disabled) { background: linear-gradient(135deg, #008822, #00bb33); box-shadow: 0 0 15px rgba(0,255,0,0.5); }
+.rct-btn:disabled { background: #222; border-color: #444; color: #666; box-shadow: none; }
+
+.inv-category { width: 100%; padding-bottom: 2px; margin-top: 5px; margin-bottom: 3px; border-bottom: 1px solid #444; font-size: 11px; color:#aaa; font-style:italic;}
+
+.vows-panel { background: rgba(255,0,0,0.1); border: 1px solid var(--cursed-red); border-radius: 6px; padding: 10px; margin-top: 10px; }
+.vow-btn { width:calc(50% - 10px); background: #331111; border: 1px solid #662222; font-size: 11px; }
+.vow-btn.active { background: #990000; border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+
+#origin-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+  z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.origin-card {
+  background: #1a1a22; border: 2px solid var(--accent);
+  padding: 20px; border-radius: 10px; margin: 10px;
+  width: 500px; text-align: left; cursor: pointer; transition: 0.2s;
+}
+.origin-card:hover { transform: scale(1.03); border-color: var(--yen-gold); box-shadow: 0 0 15px var(--yen-gold); }
+.origin-card h3 { margin-top:0; color:var(--yen-gold); border-bottom:1px solid #444; padding-bottom:5px; }
+.origin-card p { font-size:14px; color:#ddd; }
+
+#memoria-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; box-sizing: border-box; padding-bottom: 150px;
+  background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+  z-index: 9999; display: none; flex-direction: column; justify-content: flex-start; align-items: center; overflow-y: auto; padding-top: 50px;
+}
+.memoria-card { background: #111; border: 2px solid var(--accent); padding: 15px; border-radius: 8px; margin: 10px; width: 600px; text-align: left; }
+.memoria-btn { width: 150px; padding: 10px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; margin: 0 10px; transition: 0.2s; }
+.memoria-btn:hover { transform: scale(1.05); }
+.btn-vanguard { background: linear-gradient(135deg, #0055ff, #00aaff); color: white; box-shadow: 0 0 10px #00aaff;}
+.btn-godly { background: linear-gradient(135deg, #ffaa00, #ffdd00); color: black; box-shadow: 0 0 10px #ffaa00;}
+.btn-cosmic { background: linear-gradient(135deg, #aa00ff, #ff00ff); color: white; box-shadow: 0 0 10px #ff00ff;}
+
+#gp-shop-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; box-sizing: border-box; padding-bottom: 150px;
+  background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
+  z-index: 9999; display: none; flex-direction: column; justify-content: flex-start; align-items: center; overflow-y: auto; padding-top: 40px;
+}
+.gp-item {
+  background: #111; border: 1px solid #0d0d12; padding: 15px; border-radius: 8px; margin: 6px 0; width: 550px;
+  display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+}
+.gp-item:hover { border-color: #ff4d6d; box-shadow: 0 0 8px rgba(255,77,109,0.3); }
+.gp-buy-btn {
+  padding: 8px 16px; border: 1px solid #ff4d6d; background: #220000; color: #ff4d6d;
+  border-radius: 6px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s;
+}
+.gp-buy-btn:hover { background: #ff4d6d; color: #fff; }
+.gp-buy-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div id="gp-shop-overlay">
+  <button onclick="document.getElementById('gp-shop-overlay').style.display='none'" style="position:absolute; top:20px; right:20px; background:#440000; color:white; padding:10px 20px; border:1px solid #ff0000; border-radius:4px; font-weight:bold; cursor:pointer;">Close Shop</button>
+  <h1 style="color:#ff4d6d; text-shadow: 0 0 10px rgba(255,77,109,0.5); margin-bottom:5px;">Game Points Shop</h1>
+  <p style="color:#aaa; margin-top:0;">Spend GP earned from the Culling Games on permanent power.</p>
+  <h2 style="color:#ffcc00;">Your GP: <span id="gp-shop-balance">0</span></h2>
+  <div id="gp-shop-items" style="margin-top:15px; display:flex; flex-direction:column; align-items:center;"></div>
+</div>
+
+<div id="finger-info-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.92); backdrop-filter:blur(8px); z-index:9999; display:none; flex-direction:column; justify-content:center; align-items:center;">
+  <div style="background:#1a1a22; border:2px solid #ff4d6d; border-radius:12px; padding:30px; max-width:550px; width:90%; text-align:left;">
+    <h2 style="color:#ff4d6d; margin-top:0; text-align:center; text-shadow:0 0 10px rgba(255,77,109,0.5);">Sukuna's Fingers</h2>
+    <p style="color:#aaa; text-align:center; font-size:13px; margin-bottom:20px;">Obtained by performing a <b style="color:#ff00ff;">Cursed Cycle Reset</b> at Special Grade.<br>Each reset grants <b>+1 Finger</b> and permanently increases base damage &amp; Yen by 100%.</p>
+    <div style="border-top:1px solid #444; padding-top:15px;">
+      <p style="margin:8px 0;"><span style="color:#ffcc00; font-weight:bold;">1 Finger</span> — <span style="color:#ccc;">Unlocks the Memoria Hub (Shard Gacha)</span></p>
+      <p style="margin:8px 0;"><span style="color:#ff6600; font-weight:bold;">5 Fingers</span> — <span style="color:#ccc;">Malevolent Shrine: Bosses take 5% of their Max HP as true damage every second</span></p>
+      <p style="margin:8px 0;"><span style="color:#ff3366; font-weight:bold;">10 Fingers</span> — <span style="color:#ccc;">King of Curses: All skill multipliers increased by 1.5x</span></p>
+      <p style="margin:8px 0;"><span style="color:#cc0000; font-weight:bold;">15 Fingers</span> — <span style="color:#ccc;">True Incarnation: Prestige multiplier doubled, 30% chance bosses flinch</span></p>
+      <p style="margin:8px 0;"><span style="color:#ff0000; font-weight:bold; text-shadow:0 0 8px #ff0000;">20 Fingers</span> — <span style="color:#fff;">Heian Era Sukuna: 5th skill slot unlocked, all cooldowns reduced 25%</span></p>
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <button onclick="document.getElementById('finger-info-overlay').style.display='none'" style="background:#ff4d6d; color:white; padding:10px 30px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="memoria-overlay">
+  <button onclick="document.getElementById('memoria-overlay').style.display='none'" style="position:absolute; top:20px; right:20px; background:#440000; color:white; padding:10px 20px; border:1px solid #ff0000; border-radius:4px; font-weight:bold; cursor:pointer;">Close Hub</button>
+  <h1 style="color:#fff; text-shadow: 0 0 10px #ff00ff; margin-bottom:5px;">The Memoria Hub</h1>
+  <p style="color:#aaa; margin-top:0;">Spend Shards from Raids to permanently engrave Blessings onto your soul.</p>
+  <h2 style="color:#00ffff;">Memoria Shards: <span id="memoria-shards-display">0</span></h2>
+  
+  <div style="display:flex; justify-content:center; margin-top:20px;">
+    <button class="memoria-btn btn-vanguard" onclick="rollMemoria('Vanguard')">Vanguard Blessing<br>(1 Shard)</button>
+    <button class="memoria-btn btn-godly" onclick="rollMemoria('Godly')">Godly Blessing<br>(4 Shards)</button>
+    <button class="memoria-btn btn-cosmic" onclick="rollMemoria('Cosmic')">Cosmic Blessing<br>(12 Shards)</button>
+  </div>
+  
+  <div id="memoria-inventory" style="margin-top: 30px; width: 80%; display: flex; flex-direction: column; align-items: center;"></div>
+</div>
+
+<div id="origin-overlay" style="display:none;">
+   <h1 style="font-size:36px; margin-bottom:10px;">Choose Your Incarnation</h1>
+   <p style="color:#aaa; margin-bottom:30px;">This origin defines your unique passive buffs until your next Promotion.</p>
+   
+   <div class="origin-card" onclick="selectOrigin('Modern Sorcerer')">
+     <h3>Modern Sorcerer</h3>
+     <p>The new era prodigies. Channeling gives +20% more CE per click.</p>
+   </div>
+   <div class="origin-card" onclick="selectOrigin('Ancient Sorcerer')">
+     <h3>Ancient Sorcerer</h3>
+     <p>Ancient and hardened by the golden age. Massively increases survivability. (+50% Max HP)</p>
+   </div>
+   <div class="origin-card" onclick="selectOrigin('Cursed Spirit')">
+     <h3>Cursed Spirit</h3>
+     <p>Non-human biology driven by negative emotions. Triples normal healing factor. (+15% HP Regen/sec)</p>
+   </div>
+   <div class="origin-card" onclick="selectOrigin('Curse User')">
+     <h3>Curse User</h3>
+     <p>In it purely for the financial gain. Enemies drop significantly more loot. (+20% Yen Drops)</p>
+   </div>
+   <div class="origin-card" onclick="selectOrigin('Incarnated Sorcerer')">
+     <h3>Incarnated Sorcerer</h3>
+     <p>A restless soul returned. Incredibly deadly in physical combat. (+25% Base Damage)</p>
+   </div>
+</div>
+
+<div id="achievements-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); backdrop-filter:blur(5px); z-index:9000; flex-direction:column; justify-content:center; align-items:center;">
+   <div style="background:#1a1a22; border:2px solid var(--accent); padding:20px; border-radius:10px; width:600px; max-height:80vh; overflow-y:auto; position:relative;">
+      <button onclick="document.getElementById('achievements-overlay').style.display='none'" style="position:absolute; top:10px; right:10px; background:#990022;">Close</button>
+      <h2 style="color:var(--yen-gold); border-bottom:1px solid #444; padding-bottom:10px;">Achievement Board</h2>
+      <div id="achList"></div>
+   </div>
+</div>
+
+<div id="skill-swap-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); backdrop-filter:blur(5px); z-index:9500; flex-direction:column; justify-content:center; align-items:center;">
+   <div style="background:#1a1a22; border:2px solid #ff9900; padding:20px; border-radius:10px; width:600px; max-height:80vh; overflow-y:auto; position:relative;">
+      <button onclick="document.getElementById('skill-swap-overlay').style.display='none'" style="position:absolute; top:10px; right:10px; background:#990022;">Close</button>
+      <h2 style="color:#ff9900; border-bottom:1px solid #444; padding-bottom:10px;">Equip Action Slot <span id="swap-slot-id"></span></h2>
+      <div id="swapList" style="display:flex; flex-direction:column; gap:10px;"></div>
+   </div>
+</div>
+
+<div id="popup-container"></div>
+
+<div id="black-market-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
+   <div style="background:#0a0a0a; border:2px solid #ffcc00; padding:20px; border-radius:10px; width:500px; text-align:center;">
+      <h2 style="color:#ffcc00; margin-top:0;">The Black Market</h2>
+      <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Filthy rich? Buy your way to power. (Permanent Buffs)</p>
+      
+      <button id="bm-btn-ce" onclick="buyBlackMarket('ce')" style="width:100%; margin-bottom:10px; background:#111; color:#fff; border:1px solid #ffcc00; padding:10px; cursor:pointer;">
+         +5% Cursed Energy Output<br><span style="color:#ffcc00; font-size:11px;">Cost: ¥1,000,000,000 (1B)</span>
+      </button>
+      <button id="bm-btn-hp" onclick="buyBlackMarket('hp')" style="width:100%; margin-bottom:10px; background:#111; color:#fff; border:1px solid #ffcc00; padding:10px; cursor:pointer;">
+         +10% Max HP<br><span style="color:#ffcc00; font-size:11px;">Cost: ¥1,000,000,000 (1B)</span>
+      </button>
+      <button id="bm-btn-auto" onclick="buyBlackMarket('auto')" style="width:100%; margin-bottom:10px; background:#111; color:#fff; border:1px solid #ffcc00; padding:10px; cursor:pointer;">
+         Auto-Channel CE Tick<br><span style="color:#ffcc00; font-size:11px;">Cost: ¥50,000,000,000 (50B)</span>
+      </button>
+
+      <button onclick="document.getElementById('black-market-overlay').style.display='none'" style="margin-top:15px; background:#333;">Leave Market</button>
+   </div>
+</div>
+
+<div id="tss-quest-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
+   <div style="background:#110000; border:2px solid #ff9999; padding:30px; border-radius:10px; width:550px; text-align:center; box-shadow: 0 0 40px rgba(255,153,153,0.2);">
+      <h1 class="text-tss" style="margin-top:0; font-size:32px;">Awaken The Strongest</h1>
+      <p style="color:#aaa; font-size:14px; margin-bottom:25px;">Prove your absolute supremacy across all domains to unlock the pinnacle of Jujutsu Sorcery.</p>
+      
+      <div style="background:rgba(255,153,153,0.1); border:1px solid #ff9999; padding:15px; border-radius:8px; margin-bottom:15px; text-align:left;">
+         <div style="margin-bottom:10px;">
+           <strong style="color:#fff;">The Peak of Sorcery:</strong> Obtain 1 Secret rarity asset.
+           <div style="float:right; font-weight:bold;" id="tss-req-secret">0 / 1</div>
+         </div>
+         <div style="margin-bottom:10px;">
+           <strong style="color:#fff;">The Culling Victor:</strong> Defeat 50 Culling Games Players.
+           <div style="float:right; font-weight:bold;" id="tss-req-culling">0 / 50</div>
+         </div>
+         <div style="margin-bottom:10px;">
+           <strong style="color:#fff;">The Disaster Conqueror:</strong> Defeat 25 Raid Bosses.
+           <div style="float:right; font-weight:bold;" id="tss-req-raid">0 / 25</div>
+         </div>
+         <div style="margin-bottom:10px;">
+           <strong style="color:#fff;">The Special-Grade Executioner:</strong> Defeat 250 Total Bosses.
+           <div style="float:right; font-weight:bold;" id="tss-req-boss">0 / 250</div>
+         </div>
+      </div>
+      
+      <button id="tss-awaken-btn" onclick="triggerTSSAwakening()" disabled style="width:100%; padding:15px; font-size:18px; font-weight:bold; letter-spacing:2px; background:#220000; color:#888; border:1px solid #ff9999; transition:0.3s; cursor:not-allowed;">REQUIREMENTS NOT MET</button>
+      <button onclick="document.getElementById('tss-quest-overlay').style.display='none'" style="margin-top:15px; background:transparent; border:none; color:#888; text-decoration:underline;">Close Overlay</button>
+   </div>
+</div>
+
+<h1>Jujutsu Kaisen Idle - Combat Engine</h1>
+
+<div class="dashboard">
+  
+  <!-- Column 1: Stats & Vows -->
+  <div class="panel">
+    <h2>Sorcerer Status</h2>
+    <h3 style="color:var(--yen-gold); font-size:24px; text-shadow: 0 0 10px rgba(255,215,0,0.5); text-align:center; margin: 5px 0;">¥<span id="yen">0</span></h3>
+    <p style="text-align:center; color: var(--yen-gold); font-weight:bold; font-size:12px; margin-top:-5px; margin-bottom:10px;">(+¥<span id="sec">0</span>/sec from Allies)</p>
+
+    <div id="endgameStats" style="display:none; text-align:center; font-size:11px; margin-bottom:10px; color:#ffb3ba; border:1px solid #ff4d6d; padding:5px; background:#220000; border-radius:4px;">
+      Cursed Cycle Resets: <b id="rebirthsDisp" style="color:#ff00ff;">0</b> | Sukuna Fingers: <b id="fingersDisp">0</b> | Game Points: <b id="cpDisp">0</b>
+      <span id="fingerInfoBtn" onclick="document.getElementById('finger-info-overlay').style.display='flex'" style="cursor:pointer; margin-left:6px; font-size:13px; opacity:0.7;" title="What do Sukuna Fingers do?">ℹ️</span>
+    </div>
+
+    <p style="text-align:center; color: var(--accent); font-weight:bold; margin-bottom: 5px; border-top:1px solid #444; padding-top:10px;">
+      Total CE: <span id="energy">0</span> 
+      <br><span style="font-size:12px; color:#fff;">(+<span id="cePowerMultiplier">0</span>% DMG Mult)</span>
+      <br><span style="font-size:10px; color:#aaa;">Gain CE strictly via Combat Action</span>
+    </p>
+
+    <div style="text-align:center; margin-top:10px; margin-bottom:15px; background: rgba(0,0,0,0.3); padding:5px; border-radius:5px; border-left: 2px solid var(--yen-gold);">
+      <span style="font-size:11px; color:#aaa;">Origin:</span> <b id="originDisplay" style="color:var(--yen-gold);">None</b>
+    </div>
+
+    <!-- Player HP -->
+    <div style="font-weight:bold; margin-top:5px; display:flex; justify-content:space-between; align-items:flex-end;">
+       Player HP <span style="font-size: 11px; color: #aaa;">Max HP Buffs: <span id="hpBuffs">0</span>%</span>
+    </div>
+    <div class="health-bar-container" style="margin-top:5px; height:20px;">
+      <div class="health-bar"><div id="playerBar" class="player-hp-inner"></div><div id="playerHpText" class="health-text"></div></div>
+    </div>
+    
+    <button class="rct-btn" id="rctBtn" onclick="useRCT()" disabled>Reverse Cursed Technique</button>
+    
+    <!-- Body Training -->
+    <button id="trainBodyBtn" onclick="trainBody()" style="background:#228844; padding:8px; font-size:12px; margin-bottom:10px;">
+       Train Physical Body (+50 Base HP)<br>Cost: ¥<span id="trainBodyCost">500</span>
+    </button>
+
+    <button id="achBtn" onclick="toggleAchievements()" style="background:#4b0082; padding:8px; margin-bottom:10px; border:1px solid #8a2be2;">View Achievements</button>
+
+    <p>Base Hit: <span id="dmg" class="stat-value"></span></p>
+    <p>Grade: <span id="grade" class="stat-value text-epic"></span></p>
+    
+    <button id="prestigeBtn" style="width:calc(100% - 10px); margin-top: auto; background:#990022;" onclick="prestige()">Promote (Select New Origin)</button>
+    <button id="changeOriginBtn" style="width:calc(100% - 10px); margin-top: 5px; background:#441166; border:1px solid #aa66ff; display:none;" onclick="buyOriginChange()">Change Origin (1T Yen)</button>
+    <button id="blackMarketBtn" style="width:calc(100% - 10px); margin-top: 5px; background:#000; color:#ffcc00; border:1px solid #ffcc00; display:none;" onclick="openBlackMarket()">Black Market (Yen Sink)</button>
+    <button id="memoriaHubBtn" style="width:calc(100% - 10px); margin-top: 5px; background:linear-gradient(45deg, #111, #8800ff); border:1px solid #ff00ff; color:#fff; display:none; box-shadow: 0 0 10px #aa00ff;" onclick="openMemoria()">Memoria Hub (Gacha)</button>
+    <button id="gpShopBtn" style="width:calc(100% - 10px); margin-top: 5px; background:#0d0d12; border:1px solid #ff4d6d; color:#ff4d6d; display:none; font-weight:bold;" onclick="openGPShop()">Game Points Shop</button>
+    <button id="awakenTssBtn" style="width:calc(100% - 10px); margin-top: 5px; background:linear-gradient(90deg, #330000, #661111); border:1px solid #ff9999; color:#ff9999; display:block; box-shadow: 0 0 10px rgba(255,153,153,0.5); font-weight:bold; letter-spacing:1px;" onclick="openTSSQuest()">Awaken The Strongest</button>
+  </div>
+
+  <!-- Column 2: Combat & Skills -->
+  <div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+       <div style="display:flex; align-items:baseline; gap:10px;">
+           <h2 style="margin-top:0;">Active Combat</h2>
+           <div style="display:flex; gap:3px;">
+               <span style="font-size:10px; color:#888; align-self:center; margin-right:3px;">AUTO:</span>
+               <button id="afkBoss" onclick="toggleAFK('boss')" style="padding:2px 5px; font-size:10px; background:#222; color:#aaa; border:1px solid #444; border-radius:3px; cursor:pointer;">BOSS</button>
+               <button id="afkCulling" onclick="toggleAFK('culling')" style="padding:2px 5px; font-size:10px; background:#222; color:#aaa; border:1px solid #444; border-radius:3px; cursor:pointer;">CULL</button>
+               <button id="afkRaid" onclick="toggleAFK('raid')" style="padding:2px 5px; font-size:10px; background:#222; color:#aaa; border:1px solid #444; border-radius:3px; cursor:pointer;">RAID</button>
+           </div>
+       </div>
+       <span id="shards-counter" style="color:#ff00ff; font-weight:bold; font-size:12px; display:none;">Shards: 0</span>
+    </div>
+    
+    <div id="enemyNameDisplay">Safe Area <span id="enemyLevel"></span></div>
+    <div class="health-bar-container">
+      <div class="health-bar"><div id="enemyBar" class="health-bar-inner"></div><div id="enemyHpText" class="health-text"></div></div>
+    </div>
+    
+    <button class="main-clicker" onclick="clickEnergy()">Channel CE & Attack (+<span id="ceClickVal">1</span> CE)</button>
+    
+    <!-- Active Skills Panel -->
+    <div id="active-skills-container" style="display:flex; flex-wrap:wrap; gap:5px; margin-top: 10px; width: 100%;">
+       <span style="font-size:11px; color:#666; width:100%; text-align:center;">Equip a Technique or Weapon to unlock moves.</span>
+    </div>
+
+    <!-- Binding Vows -->
+    <div class="vows-panel" id="vowPanel">
+      <h3 style="font-size:14px; margin-bottom:5px;">Binding Vows (Toggle before Boss)</h3>
+      <button class="vow-btn" id="vowExec" onclick="toggleVow('execution')">Vow of Execution (5s Kill, +1000% DMG, Fail = Exorcised)</button>
+      <button class="vow-btn" id="vowPov" onclick="toggleVow('poverty')">Vow of Poverty (0 CE DMG, +1000% Yen, Fail = Exorcised)</button>
+      <button class="vow-btn" id="vowSupremacy" onclick="toggleVow('supremacy')" style="display:none; width:100%; margin-top:5px; background:#220033; border:1px solid #aa00ff; color:#aa00ff;">Vow of Supremacy (3s +5000% DMG, then 5s Stun)</button>
+    </div>
+
+    <button id="bossBtn" onclick="toggleBoss()" style="width:calc(100% - 10px); background:#ff4d6d; margin-top:10px;">Threaten Curse (Spawn Boss)</button>
+    <button id="cullingBtn" onclick="startCullingGames()" style="display:none; width:calc(100% - 10px); background:#0d0d12; border: 1px solid #ff4d6d; color:#ff4d6d; margin-top:5px; font-weight:bold;">Enter Culling Games</button>
+    <button id="raidBtn" onclick="startRaid()" style="display:none; width:calc(100% - 10px); background:linear-gradient(135deg, #111, #4400cc); border: 1px solid #aa66ff; color:#fff; margin-top:5px; font-weight:bold;">Start Raid</button>
+    
+    <div id="combatLog" class="combat-log"></div>
+  </div>
+
+  <!-- Column 3: Equipment & Gacha -->
+  <div class="panel">
+    <h2>Equipment</h2>
+    <p>Technique: <span id="tech" class="stat-value">None</span> <button id="masteryTech" onclick="mastery('technique')" style="display:none; padding:2px 5px; font-size:10px; background:#444;">Upgrade (¥)</button></p>
+    <div id="techDesc" style="font-size: 11px; color: #ccc; padding: 5px; background: rgba(0,0,0,0.3); border-left: 2px solid var(--accent); margin-bottom: 5px; display: none;"></div>
+    <p>Weapon: <span id="weapon" class="stat-value">None</span> <button id="masteryWeap" onclick="mastery('weapon')" style="display:none; padding:2px 5px; font-size:10px; background:#444;">Upgrade (¥)</button></p>
+    <div id="weapDesc" style="font-size: 11px; color: #ccc; padding: 5px; background: rgba(0,0,0,0.3); border-left: 2px solid var(--accent); margin-bottom: 5px; display: none;"></div>
+    <p>Clan: <span id="clan" class="stat-value">None</span> <button id="masteryClan" onclick="mastery('clan')" style="display:none; padding:2px 5px; font-size:10px; background:#444;">Upgrade (¥)</button></p>
+    <div id="clanDesc" style="font-size: 11px; color: #ccc; padding: 5px; background: rgba(0,0,0,0.3); border-left: 2px solid var(--accent); margin-bottom: 5px; display: none;"></div>
+    <p>Trait: <span id="trait" class="stat-value">None</span></p>
+    <div id="traitDesc" style="font-size: 11px; color: #ccc; padding: 5px; background: rgba(0,0,0,0.3); border-left: 2px solid var(--accent); margin-bottom: 15px;">No trait active.</div>
+    
+    <div id="inventoryUI" style="margin-bottom: 15px; max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 4px; border: 1px solid #444;">
+      <div style="font-size: 12px; color: #aaa; text-align: center; margin-bottom: 5px; font-weight: bold;">Player Inventory (Click to Equip)</div>
+      <div id="inventory-list" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+    </div>
+    
+    <div class="gacha-tabs">
+      <button class="gacha-tab active" onclick="switchGacha('tech')">Techniques</button>
+      <button class="gacha-tab" onclick="switchGacha('weap')">Weapons</button>
+      <button class="gacha-tab" onclick="switchGacha('trait')">Traits</button>
+      <button class="gacha-tab" onclick="switchGacha('clan')">Clans</button>
+    </div>
+    
+    <div id="gacha-tech" class="gacha-content active">
+      <button onclick="rollGacha('technique')" style="width:calc(100% - 10px); margin:0 0 5px 5px; background:var(--yen-gold); color:#000;">Spin Technique</button>
+      <div id="pity-technique" class="pity-text"></div>
+      <div id="tech-chances" class="chances-list"></div>
+    </div>
+    
+    <div id="gacha-weap" class="gacha-content">
+      <button onclick="rollGacha('weapon')" style="width:calc(100% - 10px); margin:0 0 5px 5px; background:var(--yen-gold); color:#000;">Spin Weapon</button>
+      <div id="pity-weapon" class="pity-text"></div>
+      <div id="weapon-chances" class="chances-list"></div>
+    </div>
+    
+    <div id="gacha-trait" class="gacha-content">
+      <button onclick="rollGacha('trait')" style="width:calc(100% - 10px); margin:0 0 5px 5px; background:var(--yen-gold); color:#000;">Spin Trait</button>
+      <div id="pity-trait" class="pity-text"></div>
+      <div id="trait-chances" class="chances-list"></div>
+    </div>
+    
+    <div id="gacha-clan" class="gacha-content">
+      <button onclick="rollGacha('clan')" style="width:calc(100% - 10px); margin:0 0 5px 5px; background:var(--yen-gold); color:#000;">Spin Clan</button>
+      <div id="pity-clan" class="pity-text"></div>
+      <div id="clan-chances" class="chances-list"></div>
+    </div>
+  </div>
+
+  <!-- Column 4: Allies -> YEN GENERATORS -->
+  <div class="panel">
+    <h2>Allies (Passive Yen)</h2>
+    <div id="alliesContainer" style="overflow-y:auto; max-height:500px;"></div>
+  </div>
+
+</div>
+
+<script>
+// ===== GAME STATE =====
+const gameState = {
+  yen: 0, cursedEnergy: 0, yenPerSec: 0, cePerClick: 1,
+  grade: 4, playerDamage: 5, monarchStacks: 0,
+  bossLevel: 0, bodyTrainingLevel: 0,
+  playerHp: 100, playerMaxHp: 100,
+  sorcererType: null, 
+  technique: null, weapon: null, trait: null, clan: null,
+  
+  inventory: { technique: [], weapon: [], trait: [], clan: [] },
+  lastSaveTime: Date.now(),
+  stats: { totalYen: 0, bossesDefeated: 0, raidsDefeated: 0, cullingDefeated: 0, timesPrestaged: 0, clicks: 0, blackFlashes: 0 },
+  
+  // Independent Pity Tracking System
+  pity: {
+    technique: { l: 0, m: 0, s: 0 },
+    weapon: { l: 0, m: 0, s: 0 },
+    trait: { l: 0, m: 0, s: 0 },
+    clan: { l: 0, m: 0, s: 0 }
+  },
+
+  enemy: null, isBossFight: false,
+  activeVow: null, vowTimer: 0,
+  cooldowns: {}, equippedSkills: [ {type:'t',id:1}, {type:'t',id:2}, null, null ], swapTargetSlot: 0, 
+  
+  allies: {
+    grade4: { name: "Grade 4 Sorcerer", baseCost: 100, production: 1, owned: 0, unlockGrade: 4, desc: "+¥1/sec" },
+    corpse: { name: "Cursed Corpse", baseCost: 500, production: 10, owned: 0, unlockGrade: 4, desc: "+¥10/sec" },
+    grade1: { name: "Grade 1 Sorcerer", baseCost: 5000, production: 100, owned: 0, unlockGrade: 4, desc: "+¥100/sec" },
+    grade2: { name: "Grade 2 Sorcerer", baseCost: 25000, production: 500, owned: 0, unlockGrade: 3, desc: "+¥500/sec" },
+    gojo:   { name: "Special Grade Merc", baseCost: 200000, production: 5000, owned: 0, unlockGrade: 2, desc: "+¥5k/sec" },
+    legendary: { name: "Bounty Hunter", baseCost: 1000000, production: 25000, owned: 0, unlockGrade: 1, desc: "+¥25k/sec" }
+  }
+};
+const costMultiplier = 1.20; 
+
+// ===== DATA ARRAYS =====
+const rarities = {
+  "Common": { class: "text-common" }, "Rare": { class: "text-rare" },
+  "Epic": { class: "text-epic" }, "Legendary": { class: "text-legendary" }, "Mythic": { class: "text-mythic" },
+  "Secret": { class: "text-secret" }, "The Strongest Sorcerer": { class: "text-tss" }
+};
+
+const techniques = [
+  { name: "Cursed Energy Control", rarity: "Common", dmgBuff: 0.1, chance: 0.45, skill1: {n:"Basic Strike", cd: 5, mult:2, log:"You punch the curse!"}, skill2: {n:"Cursed Sweep", cd: 20, mult:5, log:"You sweep the area!"}, skill3: {n:"Focused Blow", cd: 15, mult: 7, log:"A heavy strike connects!"}, skill4: {n:"Energy Wave", cd: 25, mult: 10, log:"A wave of energy blasts!"}, skill5: {n:"Overclock", cd: 40, mult: 15, log:"CE bursts from within!"}, skill6: {n:"Maximum Output", cd: 60, mult: 25, log:"Maximum Output obliterates!"} },
+  { name: "Tool Manipulation", rarity: "Common", dmgBuff: 0.15, chance: 0.20, skill1: {n:"Weapon Toss", cd: 6, mult:3, log:"A weapon is thrown!"}, skill2: {n:"Flurry", cd: 18, mult:6, log:"Weapon flurry!"}, skill3: {n:"Hidden Blade", cd: 15, mult: 8, log:"A trick weapon extends!"}, skill4: {n:"Arsenal Barrage", cd: 25, mult: 12, log:"Dozens of tools fall!"}, skill5: {n:"Cursed Thread", cd: 35, mult: 18, log:"Tools dance on strings!"}, skill6: {n:"Endless Armory", cd: 60, mult: 30, log:"The armory empties on them!"} },
+  { name: "Disaster Plants", rarity: "Rare", dmgBuff: 0.25, chance: 0.15, skill1: {n:"Wooden Roots", cd: 7, mult:10, log:"Roots pierce the enemy!"}, skill2: {n:"Cursed Bud", cd: 35, mult:25, log:"Cursed buds drain them!"}, skill3: {n:"Flower Field", cd: 20, mult: 20, log:"Sapping flowers bloom!"}, skill4: {n:"Cursed Seed", cd: 15, mult: 30, log:"A parasitical seed takes root!"}, skill5: {n:"Nature's Wrath", cd: 45, mult: 55, log:"Nature reclaims its land!"}, skill6: {n:"Forest Expansion", cd: 80, mult: 120, log:"Complete forest takeover!"} },
+  { name: "Cursed Speech", rarity: "Rare", dmgBuff: 0.35, chance: 0.12, skill1: {n:"SLEEP!", cd: 6, mult: 6, log:"They abruptly fall drowsy!"}, skill2: {n:"BLAST AWAY!", cd: 15, mult: 15, log:"They are violently repelled!"}, skill3: {n:"PLUMMET!", cd: 25, mult: 25, log:"Gravity crushes them down!"}, skill4: {n:"STOP!", cd: 40, mult: 40, log:"They completely freeze!"}, skill5: {n:"CRUSH!", cd: 30, mult: 55, log:"They are aggressively flattened!"}, skill6: {n:"DIE!", cd: 80, mult: 100, log:"A lethal command, tearing your throat!"} },
+  { name: "Ratio Technique", rarity: "Rare", dmgBuff: 0.4, chance: 0.10, skill1: {n:"7:3 Strike", cd: 5, mult:8, log:"Critical point struck!"}, skill2: {n:"Collapse", cd: 25, mult:18, log:"Aimed at the foundation!"}, skill3: {n:"Calculation", cd: 10, mult: 12, log:"Weakness calculated!"}, skill4: {n:"Overtime", cd: 45, mult: 35, log:"Overtime unlocks full power!"}, skill5: {n:"Severing Blow", cd: 15, mult: 20, log:"Severed cleanly!"}, skill6: {n:"Resonance Strike", cd: 60, mult: 60, log:"Complete ratio destruction!"} },
+  { name: "Mythical Beast Amber", rarity: "Epic", dmgBuff: 5.0, chance: 0.05, skill1: {n:"Lightning Discharge", cd: 5, mult:6, log:"Lightning blasts the enemy!"}, skill2: {n:"Phantom Beast Ambush", cd: 40, mult:20, log:"Mythical Beast obliterates!"}, skill3: {n:"Electromagnetic Pulse", cd: 15, mult: 15, log:"EMP disrupts their flow!"}, skill4: {n:"Mach 3 Dash", cd: 25, mult: 30, log:"Sound barrier shattered!"}, skill5: {n:"Peal of Thunder", cd: 35, mult: 45, log:"Thunder deafens!"}, skill6: {n:"Incarnation: Absolute", cd: 80, mult: 100, log:"Amber absorbs completely!"} },
+  { name: "Blood Manipulation", rarity: "Epic", dmgBuff: 6.5, chance: 0.035, skill1: {n:"Piercing Blood", cd: 8, mult:5, log:"Piercing Blood shreds the enemy!"}, skill2: {n:"Supernova", cd: 30, mult:15, log:"Supernova detonates!"}, skill3: {n:"Slicing Exorcism", cd: 12, mult: 10, log:"A blood blade swings!"}, skill4: {n:"Flowing Red Scale", cd: 40, mult: 25, log:"Body heat vaporizes blood!"}, skill5: {n:"Convergence", cd: 20, mult: 20, log:"Blood violently condenses!"}, skill6: {n:"Maximum: Wing King", cd: 70, mult: 50, log:"Poisonous blood wings emerge!"} },
+  { name: "Construction", rarity: "Epic", dmgBuff: 8.0, chance: 0.02, skill1: {n:"Liquid Metal Strike", cd: 6, mult: 12, log:"Liquid metal pierces them!"}, skill2: {n:"Insect Armor", cd: 25, mult: 20, log:"You clad yourself in resilient armor!"}, skill3: {n:"Metallic Wing Sweep", cd: 15, mult: 25, log:"Metal wings slash the area!"}, skill4: {n:"True Sphere Formation", cd: 45, mult: 45, log:"Infinite pressure begins building!"}, skill5: {n:"Domain: Triple Affliction", cd: 80, mult: 80, log:"A fleshy, chaotic domain surrounds them!"}, skill6: {n:"True Sphere: Perfect Execution", cd: 110, mult: 150, log:"The Perfect Sphere ignores all reality and crushes!"} },
+  { name: "Idle Death Gamble", rarity: "Legendary", dmgBuff: 12.0, chance: 0.007, skill1: {n:"Train Doors", cd: 10, mult:10, log:"Train sliding doors slam them!"}, skill2: {n:"Domain: Jackpot", cd: 60, mult:50, log:"JACKPOT! Infinite Cursed Energy!"}, skill3: {n:"Probability Shift", cd: 15, mult: 25, log:"The odds shift favorably!"}, skill4: {n:"Vibration Sphere", cd: 30, mult: 40, log:"Vibration crushes them!"}, skill5: {n:"Fever Pitch", cd: 40, mult: 80, log:"The fever rises to maximum!"}, skill6: {n:"Infinite Regen Crush", cd: 90, mult: 200, log:"Immortal raw power strikes!"} },
+  { name: "Copy (Yuta)", rarity: "Legendary", dmgBuff: 15.0, chance: 0.005, skill1: {n:"Thin Ice Breaker", cd: 8, mult:15, log:"Space breaks like thin ice!"}, skill2: {n:"Domain: Mutual Love", cd: 60, mult:60, log:"Authentic Mutual Love copies their doom!"}, skill3: {n:"Rika Manifestation", cd: 25, mult: 35, log:"RIKA! Kill them!"}, skill4: {n:"Cursed Speech", cd: 20, mult: 40, log:"DON'T MOVE!"}, skill5: {n:"Jacob's Ladder", cd: 50, mult: 100, log:"Extreme light purifies!"}, skill6: {n:"Ultimate Love Beam", cd: 100, mult: 250, log:"Pure love vaporizes everything!"} },
+  { name: "Star Rage", rarity: "Legendary", dmgBuff: 18.0, chance: 0.002, skill1: {n:"Virtual Mass", cd: 10, mult:25, log:"Overwhelming mass strikes!"}, skill2: {n:"Black Hole", cd: 70, mult:100, log:"A Black Hole absorbs everything!"}, skill3: {n:"Garuda Whip", cd: 15, mult: 40, log:"Garuda lashes out!"}, skill4: {n:"Meteor Kick", cd: 25, mult: 60, log:"A kick with the weight of meteorites!"}, skill5: {n:"Planetary Crush", cd: 45, mult: 120, log:"Planetary mass compresses!"}, skill6: {n:"Supernova Implosion", cd: 110, mult: 300, log:"Everything collapses internally!"} },
+  { name: "Angel's Extinguishment", rarity: "Legendary", dmgBuff: 20.0, chance: 0.001, skill1: {n:"Trumpet Resound", cd: 8, mult: 15, log:"A trumpet of purification echoes!"}, skill2: {n:"Cherub's Shield", cd: 20, mult: 25, log:"White wings block incoming damage!"}, skill3: {n:"Holy Light Beam", cd: 15, mult: 35, log:"A blinding light sears their soul!"}, skill4: {n:"Technique Nullifier", cd: 40, mult: 50, log:"Their Innate Technique fractures!"}, skill5: {n:"Divine Flight", cd: 30, mult: 60, log:"You soar out of reach, dropping light!"}, skill6: {n:"Jacob's Ladder", cd: 90, mult: 180, log:"A pillar of absolute purification descends from heaven!"} },
+  { name: "Sky Manipulation", rarity: "Legendary", dmgBuff: 25.0, chance: 0.0008, skill1: {n:"Spatial Contortion", cd: 6, mult: 20, log:"The sky bends violently!"}, skill2: {n:"Flight Evasion", cd: 20, mult: 30, log:"You warp space to avoid an attack!"}, skill3: {n:"Thin Ice Breaker", cd: 12, mult: 40, log:"A spatial strike shatters like ice!"}, skill4: {n:"Reflective Sky Surface", cd: 35, mult: 55, log:"Their attack is warped back at them!"}, skill5: {n:"Atmospheric Crush", cd: 50, mult: 80, log:"The air pressure itself crushes them!"}, skill6: {n:"Maximum: Empty Sky", cd: 100, mult: 220, log:"The entire localized space violently rips apart!"} },
+  { name: "Projection Sorcery", rarity: "Mythic", dmgBuff: 40.0, chance: 0.0004, skill1: {n:"Accelerated Step", cd: 4, mult: 25, col:"#ffcc00", log:"A blurry dash!"}, skill2: {n:"24 FPS Trajectory", cd: 15, mult: 45, col:"#ccccff", log:"The frame rules accelerate!"}, skill3: {n:"Aura Freeze", cd: 30, mult: 65, col:"#ccd9ff", log:"Frozen inside an anomalous frame!"}, skill4: {n:"Mach 1 Assault", cd: 20, mult: 80, col:"#ffff99", log:"A supersonic barrage!"}, skill5: {n:"Domain: Time Cell Moon Palace", cd: 75, mult: 150, col:"#ff80df", log:"The cellular structure itself must follow 24 frames!"}, skill6: {n:"Maximum Speed: Supreme Frame", cd: 50, mult: 280, col:"#ffffff", log:"You shatter the sonic barrier directly into them!"} },
+  { name: "Ice Formation", rarity: "Mythic", dmgBuff: 45.0, chance: 0.0003, skill1: {n:"Frost Surge", cd: 6, mult: 20, col:"#99ffff", log:"A bitter frost bites them!"}, skill2: {n:"Ice Column", cd: 12, mult: 40, col:"#66ccff", log:"A massive column of ice erupts!"}, skill3: {n:"Frost Calm", cd: 35, mult: 80, col:"#b3e6ff", log:"A chilling mist freezes them to the bone!"}, skill4: {n:"Glacial Expanse", cd: 25, mult: 100, col:"#e6f7ff", log:"The entire floor freezes instantly!"}, skill5: {n:"Ice Fall", cd: 50, mult: 160, col:"#ccccff", log:"Gigantic icicles rain indiscriminately!"}, skill6: {n:"Maximum: Absolute Zero", cd: 110, mult: 350, col:"#ffffff", log:"All thermal motion ceases completely!"} },
+  { name: "Ten Shadows", rarity: "Mythic", dmgBuff: 50.0, chance: 0.0002, skill1: {n:"Divine Dogs: Totality", cd: 8, mult: 30, col:"#1a1a1a", log:"The fused hound brutally tears flesh!"}, skill2: {n:"Nue's Lightning", cd: 15, mult: 45, col:"#ffcc00", log:"A cursed lightning strike from above!"}, skill3: {n:"Max Elephant Drop", cd: 25, mult: 70, col:"#ccccff", log:"A massive elephant crushes them with water!"}, skill4: {n:"Domain: Chimera Shadow Garden", cd: 70, mult: 120, col:"#000000", log:"A sea of shadows continuously swarms!"}, skill5: {n:"Piercing Ox Charge", cd: 40, mult: 180, col:"#ff4d4d", log:"An unstoppable accelerating charge connects!"}, skill6: {n:"Sacred Treasure: Mahoraga", cd: 140, mult: 600, col:"#e6e6fa", log:"WITH THIS TREASURE I SUMMON! Mahoraga executes them!"} },
+  { name: "Comedian", rarity: "Mythic", dmgBuff: 55.0, chance: 0.00015, skill1: {n:"Wouldn't it be funny...", cd: 2, mult:30, col:"#ffcc00", log:"Reality warps humorously!"}, skill2: {n:"Truck Kun", cd: 30, mult:100, col:"#cccccc", log:"A truck appears out of nowhere!"}, skill3: {n:"Slapstick Hammer", cd: 10, mult: 50, col:"#ff9933", log:"A cartoon hammer smashes!"}, skill4: {n:"Piano Drop", cd: 20, mult: 80, col:"#eeeeee", log:"A grand piano crushes them flat!"}, skill5: {n:"Gag Reel", cd: 40, mult: 180, col:"#ff66b2", log:"Reality becomes a comedy skit!"}, skill6: {n:"Fourth Wall Break", cd: 90, mult: 550, col:"#33ff33", log:"The code itself attacks them!"} },
+  { name: "Limitless (Gojo)", rarity: "Secret", dmgBuff: 250.0, chance: 0.00008, skill1: {n:"Cursed Reversal: Red", cd: 5, mult: 40, col:"#ff1a1a", log:"Red blasts them away!"}, skill2: {n:"Domain: Unlimited Void", cd: 30, mult: 150, col:"#66ccff", log:"Unlimited Void paralyzes them!"}, skill3: {n:"Cursed Technique: Blue", cd: 8, mult: 80, col:"#0073e6", log:"Blue crushes their atoms!"}, skill4: {n:"Infinity Burst", cd: 15, mult: 100, col:"#cc99ff", log:"Infinity expands violently!"}, skill5: {n:"Hollow Purple", cd: 45, mult: 450, col:"#9900ff", log:"Imaginary mass erases reality!"}, skill6: {n:"200% Hollow Purple", cd: 100, mult: 1250, col:"#ff66ff", log:"An unrestricted nuke of Purple!"} },
+  { name: "Modulo (Itadori) <img src='itadori.png' style='width:24px;height:24px;vertical-align:middle;border-radius:5px;border:1px solid rgba(255,153,153,0.6);'>", rarity: "The Strongest Sorcerer", dmgBuff: 300.0, chance: 0, skill1: {n:"Black Flash Barrage", cd: 4, mult: 100, col:"#ff9999", log:"Black Sparks constantly flash!"}, skill2: {n:"Soul Dismantle", cd: 25, mult: 600, col:"#ffcccc", log:"Their soul is completely severed!"}, skill3: {n:"Divergent Fist", cd: 8, mult: 160, col:"#ffb3b3", log:"A delayed impact strikes internally!"}, skill4: {n:"Manji Kick", cd: 15, mult: 240, col:"#ffe6e6", log:"A perfect martial arts kick!"}, skill5: {n:"Piercing Blood", cd: 20, mult: 400, col:"#ffcccc", log:"A lethal beam of blood!"}, skill6: {n:"Secret Domain: Benevolent Shrine", cd: 80, mult: 2000, col:"#ffffff", log:"True salvation obliterates unconditionally!"} },
+  { name: "True Form (Sukuna)", rarity: "Secret", dmgBuff: 250.0, chance: 0.00002, skill1: {n:"Four-Armed Suppression", cd: 5, mult: 60, col:"#ff4d4d", log:"Overwhelming physical combat superiority!"}, skill2: {n:"Kamutoke Lightning", cd: 12, mult: 100, col:"#ffcc00", log:"Kamutoke strikes them with raw lightning!"}, skill3: {n:"Chanted Dismantle", cd: 20, mult: 180, col:"#ffb3b3", log:"Scale of the dragon, recoil, twin meteors!"}, skill4: {n:"Hollow Wicker Basket", cd: 40, mult: 250, col:"#e6e6e6", log:"Two hands weave defense while the others attack!"}, skill5: {n:"Domain: Open Barrier Shrine", cd: 75, mult: 400, col:"#ff0000", log:"A divine, unclosed domain completely disintegrates them!"}, skill6: {n:"World Cutting Slash", cd: 130, mult: 1200, col:"#ffffff", log:"You cut the very fabric of the world itself!"} }
+];
+
+const weapons = [
+  { name: "Rusty Knife", rarity: "Common", dmgBonus: 1, chance: 0.45, wSkill: {n:"Shank", cd:6, mult:2, log:"A rusty shank cuts deep!"} },
+  { name: "Wooden Bokken", rarity: "Common", dmgBonus: 3, chance: 0.30, wSkill: {n:"Wood Strike", cd:6, mult:3, log:"Bokken slash!"} },
+  { name: "Cursed Katana", rarity: "Rare", dmgBonus: 6, chance: 0.15, wSkill: {n:"Iaido", cd:10, mult:5, log:"A clean sword draw!"} },
+  { name: "Handgun", rarity: "Rare", dmgBonus: 12, chance: 0.08, wSkill: {n:"Cursed Bullet", cd:4, mult:4, log:"BANG!"} },
+  { name: "Slaughter Demon", rarity: "Epic", dmgBonus: 25, chance: 0.012, wSkill: {n:"Demon Cleave", cd:15, mult:10, log:"Slaughtering slash!"} },
+  { name: "Jet Black Blade", rarity: "Epic", dmgBonus: 40, chance: 0.005, wSkill: {n:"Shadow Slash", cd:15, mult:15, log:"A dark slash cuts reality!"} },
+  { name: "Playful Cloud", rarity: "Legendary", dmgBonus: 80, chance: 0.0019, wSkill: {n:"Tri-Staff Beatdown", cd:20, mult:25, log:"The legendary staff crushes!"} },
+  { name: "Split Soul Katana", rarity: "Legendary", dmgBonus: 120, chance: 0.0007, wSkill: {n:"Soul Sever", cd:30, mult:40, log:"Their raw soul is cut entirely!"} },
+  { name: "Executioner's Sword", rarity: "Mythic", dmgBonus: 300, chance: 0.0003, wSkill: {n:"Judgement", cd:50, mult:100, log:"GUILTY! Instant destruction!"} },
+  { name: "Inverted Spear of Heaven", rarity: "Mythic", dmgBonus: 500, chance: 0.0001, wSkill: {n:"Technique Nullification", cd:60, mult:150, log:"Cursed techniques are shattered!"} },
+  { name: "Split Soul Katana (Awakened)", rarity: "Secret", dmgBonus: 1500, chance: 0.00005, wSkill: {n:"Absolute Soul Sever", cd:40, mult:800, log:"Their very existence is split open!"} },
+  { name: "Kamutoke (True Version)", rarity: "Secret", dmgBonus: 2000, chance: 0.00002, wSkill: {n:"Divine Thunderburst", cd:20, mult:400, log:"Raw lightning falls from the heavens!"} }
+];
+
+const traits = [
+  { name: "Nimble", rarity: "Common", dmgBuff: 0, hpBuff: 0.1, chance: 0.40, desc: "+10% Max HP." },
+  { name: "Sturdy", rarity: "Common", dmgBuff: 0, hpBuff: 0.2, chance: 0.25, desc: "+20% Max HP." },
+  { name: "Cursed", rarity: "Rare", dmgBuff: 0.2, hpBuff: 0.2, chance: 0.18, desc: "+20% Base DMG, +20% Max HP." },
+  { name: "Fierce", rarity: "Rare", dmgBuff: 0.4, hpBuff: 0, chance: 0.08, desc: "+40% Base DMG." },
+  { name: "Resilient", rarity: "Epic", dmgBuff: 3.5, hpBuff: 0.6, chance: 0.05, desc: "+350% Base DMG, +60% Max HP." },
+  { name: "Unbreakable", rarity: "Epic", dmgBuff: 0.2, hpBuff: 3.0, chance: 0.025, desc: "Massive +300% Max HP." },
+  { name: "Fortune", rarity: "Legendary", dmgBuff: 8.0, hpBuff: 0.25, chance: 0.01, desc: "Triples all Yen drops! +800% Base DMG." },
+  { name: "Ruthless", rarity: "Legendary", dmgBuff: 12.0, hpBuff: 0, chance: 0.004, desc: "+1,200% Base DMG." },
+  { name: "Heavenly Restricted", rarity: "Mythic", dmgBuff: 35.0, hpBuff: 15.0, chance: 0.0005, desc: "+3,500% Base DMG, +1500% HP. CE Mult Disabled." },
+  { name: "Monarch", rarity: "Mythic", dmgBuff: 15.0, hpBuff: 5.0, chance: 0.0003, desc: "+1,500% DMG, +500% HP. Snowball scaling." },
+  { name: "The Six Eyes", rarity: "Mythic", dmgBuff: 45.0, hpBuff: 10.0, chance: 0.0002, desc: "Unrivaled perception. +4,500% Base DMG, halves CDs." },
+  { name: "The Honored One", rarity: "Secret", dmgBuff: 150.0, hpBuff: 50.0, chance: 0.00005, desc: "Immune to Vow penalties! +15,000% DMG." },
+  { name: "The Disgraced One", rarity: "Secret", dmgBuff: 250.0, hpBuff: -0.5, chance: 0.00002, desc: "+25,000% Base DMG, but Max HP is severely slashed." }
+];
+
+const clansArray = [
+  { name: "Civilian", rarity: "Common", dmgBuff: 0, hpBuff: 0, chance: 0.45 },
+  { name: "Minor Sorcerer Family", rarity: "Common", dmgBuff: 0.05, hpBuff: 0.05, chance: 0.20 },
+  { name: "Inumaki Clan", rarity: "Rare", dmgBuff: 0.1, hpBuff: 0.1, chance: 0.15 },
+  { name: "Gakuganji Clan", rarity: "Rare", dmgBuff: 0.2, hpBuff: 0.05, chance: 0.08 },
+  { name: "Kamo Clan", rarity: "Epic", dmgBuff: 1.5, hpBuff: 1.5, chance: 0.07 },
+  { name: "Fushiguro Family", rarity: "Epic", dmgBuff: 2.5, hpBuff: 0.8, chance: 0.035 },
+  { name: "Zenin Clan", rarity: "Legendary", dmgBuff: 8.0, hpBuff: 1.0, chance: 0.01 },
+  { name: "Itadori Family", rarity: "Legendary", dmgBuff: 3.0, hpBuff: 5.5, chance: 0.004 },
+  { name: "Gojo Clan", rarity: "Mythic", dmgBuff: 30.0, hpBuff: 15.0, chance: 0.0006 },
+  { name: "Sugawara Clan", rarity: "Mythic", dmgBuff: 35.0, hpBuff: 8.0, chance: 0.0003 },
+  { name: "Fujiwara Clan", rarity: "Mythic", dmgBuff: 20.0, hpBuff: 20.0, chance: 0.0001 },
+  { name: "The Ryomen Bloodline", rarity: "Secret", dmgBuff: 150.0, hpBuff: 50.0, chance: 0.00005 }
+];
+
+const memorias = {
+  "Vanguard": [
+    { name: "Battle Instinct", rarity: "Vanguard", desc: "+100% total damage when your HP is below 50%." },
+    { name: "Iron Will", rarity: "Vanguard", desc: "+150% Max HP globally." },
+    { name: "Combo Drive", rarity: "Vanguard", desc: "Every manual channel of CE adds a 1% escalating damage multiplier. Resets on Boss kill." }
+  ],
+  "Godly": [
+    { name: "Judgment Chain", rarity: "Godly", desc: "Active skills have a 20% chance to bind the enemy, skipping their next attack frame." },
+    { name: "Flowing Force", rarity: "Godly", desc: "Manual CE channeling reduces all active skill cooldowns by 1 second per 5 clicks." }
+  ],
+  "Cosmic": [
+    { name: "Heaven's Debt", rarity: "Cosmic", desc: "Flat +2,000% Damage Multiplier. But getting exorcised permanently extinguishes 25% of ALL your Yen." },
+    { name: "Void Echo", rarity: "Cosmic", desc: "10% chance that casting an active skill instantly casts it a second time for free." }
+  ]
+};
+
+function checkMemoria(name) { return gameState.memoria && gameState.memoria.find(m => m.name === name); }
+
+function openMemoria() {
+  document.getElementById('memoria-shards-display').innerText = gameState.memoriaShards || 0;
+  renderMemoriaInventory();
+  document.getElementById('memoria-overlay').style.display = 'flex';
+}
+
+function renderMemoriaInventory() {
+  let html = "";
+  if (!gameState.memoria) gameState.memoria = [];
+  gameState.memoria.forEach(m => {
+    let col = m.rarity === 'Vanguard' ? '#00aaff' : m.rarity === 'Godly' ? '#ffaa00' : '#ff00ff';
+    html += `<div class="memoria-card" style="border-color:${col};">
+       <h3 style="color:${col}; margin-top:0;">${m.name} [${m.rarity}]</h3>
+       <p style="color:#ccc; font-size:14px;">${m.desc}</p>
+    </div>`;
+  });
+  if(html === "") html = "<p style='color:#666;'>No blessings acquired yet.</p>";
+  document.getElementById('memoria-inventory').innerHTML = html;
+}
+
+function rollMemoria(tier) {
+  let cost = tier === 'Vanguard' ? 1 : tier === 'Godly' ? 4 : 12;
+  if ((gameState.memoriaShards || 0) < cost) { showFloaty("Not enough Shards!", false, false); return; }
+  
+  if (!gameState.memoria) gameState.memoria = [];
+  let pool = memorias[tier];
+  let unowned = pool.filter(p => !gameState.memoria.find(m => m.name === p.name));
+  
+  if (unowned.length === 0) { showFloaty(`All ${tier} Blessings acquired!`, false, false); return; }
+  
+  gameState.memoriaShards -= cost;
+  let rolled = unowned[Math.floor(Math.random() * unowned.length)];
+  gameState.memoria.push(rolled);
+  
+  let flash = document.createElement("div"); flash.className = "black-flash-screen";
+  flash.style.background = tier === 'Cosmic' ? "rgba(255,0,255,1)" : tier === 'Godly' ? "rgba(255,200,0,1)" : "rgba(0,150,255,1)";
+  document.body.appendChild(flash); setTimeout(() => flash.remove(), 800);
+  
+  document.getElementById('memoria-shards-display').innerText = gameState.memoriaShards;
+  renderMemoriaInventory(); recalc(); updateUI(); saveGame();
+}
+
+// ===== GP SHOP =====
+const gpShopItems = [
+  { id: 'barrier', name: 'Colony Barrier Fragment', cost: 3, max: 10,
+    desc: '+200% Max HP permanently. Stackable.',
+    apply: 'Provides +200% Max HP per owned.' },
+  { id: 'kogane', name: "Kogane's Blessing", cost: 5, max: 1,
+    desc: '+500% passive Yen generation from Allies. One-time.',
+    apply: '+500% Ally Yen output.' },
+  { id: 'extension', name: 'Rule Addition: Extension', cost: 8, max: 1,
+    desc: 'Culling Games timer permanently 60s → 90s.',
+    apply: 'Culling timer = 90s.' },
+  { id: 'toolcache', name: 'Cursed Tool Cache', cost: 10, max: 99,
+    desc: 'Instantly grants 5 random weapon spins (free).',
+    apply: '5 free weapon rolls.' },
+  { id: 'supremacy', name: 'Binding Vow: Supremacy', cost: 15, max: 1,
+    desc: 'Unlocks new Binding Vow: +5,000% DMG for 3s, stunned 5s.',
+    apply: 'Unlocks Vow of Supremacy.' },
+  { id: 'domainamplify', name: 'Domain Amplification', cost: 25, max: 1,
+    desc: 'Your attacks ignore 20% of all enemy dodge effects.',
+    apply: 'Reduces dodge by 20%.' }
+];
+
+function openGPShop() {
+  document.getElementById('gp-shop-balance').innerText = gameState.cullingPoints;
+  renderGPShop();
+  document.getElementById('gp-shop-overlay').style.display = 'flex';
+}
+
+function renderGPShop() {
+  if (!gameState.gpShop) gameState.gpShop = {};
+  let html = '';
+  gpShopItems.forEach(item => {
+    let owned = gameState.gpShop[item.id] || 0;
+    let maxed = owned >= item.max;
+    let canBuy = gameState.cullingPoints >= item.cost && !maxed;
+    html += `<div class="gp-item">
+      <div style="flex:1;">
+        <strong style="color:#ff4d6d; font-size:14px;">${item.name}</strong>
+        <span style="color:#888; font-size:11px; margin-left:8px;">${item.max > 1 ? `(Owned: ${owned}/${item.max})` : (maxed ? '(OWNED)' : '')}</span>
+        <p style="color:#ccc; font-size:12px; margin:4px 0 0;">${item.desc}</p>
+      </div>
+      <button class="gp-buy-btn" ${canBuy ? '' : 'disabled'} onclick="buyGPItem('${item.id}')">${maxed ? 'MAX' : item.cost + ' GP'}</button>
+    </div>`;
+  });
+  document.getElementById('gp-shop-items').innerHTML = html;
+}
+
+function buyGPItem(itemId) {
+  let item = gpShopItems.find(i => i.id === itemId);
+  if (!item) return;
+  if (!gameState.gpShop) gameState.gpShop = {};
+  let owned = gameState.gpShop[item.id] || 0;
+  if (owned >= item.max || gameState.cullingPoints < item.cost) return;
+  
+  gameState.cullingPoints -= item.cost;
+  gameState.gpShop[item.id] = owned + 1;
+  
+  // Immediate effects
+  if (item.id === 'toolcache') {
+    for (let i = 0; i < 5; i++) rollGacha('weapon');
+    showFloaty("5 Free Weapon Spins!", false, false);
+    gameState.yen += getGachaCost('weapon') * 5; // Refund the yen that rollGacha spent
+  }
+  
+  if (item.id === 'supremacy') {
+    updateLog("BINDING VOW: SUPREMACY has been engraved into your soul!", "sys");
+  }
+  
+  showFloaty("Purchased: " + item.name, false, false);
+  document.getElementById('gp-shop-balance').innerText = gameState.cullingPoints;
+  renderGPShop(); recalc(); updateUI(); saveGame();
+}
+
+const bossesNames = ["Finger Bearer", "Smallpox Deity", "Hanami", "Dagon", "Jogo", "Mahito", "Ryomen Sukuna"];
+const achievements = [
+  { id: 'boss_1', name: 'First Exorcism', desc: 'Defeat your first Boss.', req: () => gameState.stats.bossesDefeated >= 1, buffText: '+5% Max HP', apply: (m) => m.hp += 0.05 },
+  { id: 'boss_50', name: 'Special Grade Curse Killer', desc: 'Defeat 50 Bosses total.', req: () => gameState.stats.bossesDefeated >= 50, buffText: '+50% Max HP', apply: (m) => m.hp += 0.50 },
+  { id: 'rich_1m', name: 'Curse User Wealth', desc: 'Earn 1,000,000 Yen total.', req: () => gameState.stats.totalYen >= 1000000, buffText: '+10% Yen Gain', apply: (m) => m.yen += 0.10 },
+  { id: 'click_1k', name: 'Cursed Energy Output', desc: 'Channel CE 1,000 times.', req: () => gameState.stats.clicks >= 1000, buffText: '+10% Base DMG', apply: (m) => m.dmg += 0.10 },
+  { id: 'flash_10', name: 'Sparks of Black', desc: 'Land 10 Black Flashes.', req: () => gameState.stats.blackFlashes >= 10, buffText: '+25% Base DMG', apply: (m) => m.dmg += 0.25 },
+  { id: 'prestige_1', name: 'First Promotion', desc: 'Promote your Grade for the first time.', req: () => gameState.stats.timesPrestaged >= 1, buffText: '+20% Base DMG, +20% Max HP', apply: (m) => { m.dmg += 0.20; m.hp += 0.20; } }
+];
+
+function getAchievementBuffs() {
+  let m = { hp: 0, dmg: 0, yen: 0 };
+  achievements.forEach(a => { if (a.req()) a.apply(m); });
+  return m;
+}
+
+function toggleAchievements() {
+  document.getElementById('achievements-overlay').style.display = 'flex';
+  let html = '';
+  achievements.forEach(a => {
+    let unlocked = a.req();
+    html += `<div style="padding:10px; margin-bottom:10px; border-left:4px solid ${unlocked ? 'var(--player-hp-bar)' : '#444'}; background:rgba(0,0,0,0.4);">
+      <h4 style="margin:0; color:${unlocked ? '#fff' : '#666'};">${a.name} ${unlocked ? '✅' : '❌'}</h4>
+      <p style="margin:5px 0; font-size:12px; color:#aaa;">${a.desc}</p>
+      <p style="margin:0; font-size:12px; font-weight:bold; color:var(--yen-gold);">Reward: ${a.buffText}</p>
+    </div>`;
+  });
+  document.getElementById('achList').innerHTML = html;
+}
+
+// ===== CACHE =====
+const DOM = {
+  yen: document.getElementById('yen'), energy: document.getElementById('energy'), cePowerMultiplier: document.getElementById('cePowerMultiplier'),
+  sec: document.getElementById('sec'), dmg: document.getElementById('dmg'), grade: document.getElementById('grade'),
+  tech: document.getElementById('tech'), weapon: document.getElementById('weapon'), trait: document.getElementById('trait'), clan: document.getElementById('clan'),
+  techDesc: document.getElementById('techDesc'), weapDesc: document.getElementById('weapDesc'), clanDesc: document.getElementById('clanDesc'), traitDesc: document.getElementById('traitDesc'),
+  originDisplay: document.getElementById('originDisplay'), hpBuffs: document.getElementById('hpBuffs'),
+  playerHpText: document.getElementById('playerHpText'), playerBar: document.getElementById('playerBar'),
+  rctBtn: document.getElementById('rctBtn'), fingersDisp: document.getElementById('fingersDisp'), cpDisp: document.getElementById('cpDisp'),
+  trainBodyBtn: document.getElementById('trainBodyBtn'), trainBodyCost: document.getElementById('trainBodyCost'),
+  ceClickVal: document.getElementById('ceClickVal'),
+  enemyNameDisplay: document.getElementById('enemyNameDisplay'), enemyLevel: document.getElementById('enemyLevel'),
+  enemyHpText: document.getElementById('enemyHpText'), enemyBar: document.getElementById('enemyBar'),
+  popupContainer: document.getElementById('popup-container'), prestigeBtn: document.getElementById('prestigeBtn'),
+  log: document.getElementById('combatLog'), bossBtn: document.getElementById('bossBtn'), cullingBtn: document.getElementById('cullingBtn'),
+  originOverlay: document.getElementById('origin-overlay'), endgameStats: document.getElementById('endgameStats'),
+  tssQuestOverlay: document.getElementById('tss-quest-overlay'), reqSecret: document.getElementById('tss-req-secret'),
+  reqCulling: document.getElementById('tss-req-culling'), reqRaid: document.getElementById('tss-req-raid'), reqBoss: document.getElementById('tss-req-boss'),
+  awakenBtn: document.getElementById('tss-awaken-btn'), awakenTssBtn: document.getElementById('awakenTssBtn')
+};
+
+const allyUIElements = {}; 
+
+function initGame() {
+  loadGame();
+  
+  // Quick migration for old saves
+  ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
+    if (gameState[t] && !gameState.inventory[t].find(i => i.name === gameState[t].name)) {
+      gameState.inventory[t].push(gameState[t]);
+    }
+  });
+  
+  if (!gameState.sorcererType) {
+    DOM.originOverlay.style.display = "flex";
+  }
+
+  for (let key in gameState.allies) {
+    let ally = gameState.allies[key];
+    let div = document.createElement("div"); div.className = "upgrade-card"; div.id = `ally-card-${key}`;
+    div.style.display = ally.unlockGrade >= gameState.grade ? "flex" : "none";
+    div.innerHTML = `<div class="upgrade-info"><div class="upgrade-name">${ally.name} <span style="font-weight:normal; font-size:12px; color:#aaa;">(Own: <span id="${key}-owned">${ally.owned}</span>)</span></div><div class="upgrade-desc">${ally.desc}</div></div><button class="upgrade-btn" id="buy-${key}" onclick="buyAlly('${key}')">Cost:<br>¥<span id="${key}-cost" style="color:var(--yen-gold); font-weight:bold;">${formatNumber(getAllyCost(key))}</span></button>`;
+    document.getElementById('alliesContainer').appendChild(div);
+    allyUIElements[key] = { card: div, owned: document.getElementById(`${key}-owned`), cost: document.getElementById(`${key}-cost`), btn: document.getElementById(`buy-${key}`) };
+  }
+  populateChances('tech-chances', techniques); populateChances('weapon-chances', weapons); populateChances('trait-chances', traits); populateChances('clan-chances', clansArray);
+
+  recalc();
+  
+  // Offline Progress Calculation
+  if (gameState.pendingOfflineSeconds && gameState.yenPerSec > 0) {
+    let earned = gameState.yenPerSec * gameState.pendingOfflineSeconds;
+    gameState.yen += earned;
+    setTimeout(() => {
+      alert(`Welcome back, Sorcerer!\n\nWhile you were resting, your Mercenaries earned ¥${formatNumber(earned)} over ${formatNumber(gameState.pendingOfflineSeconds)} seconds!`);
+    }, 500);
+  }
+  gameState.pendingOfflineSeconds = 0;
+
+  if (!gameState.enemy || gameState.enemy.hp <= 0) spawnEnemy(false);
+  
+  setInterval(gameTick, 1000);
+  setInterval(saveGame, 5000); 
+  updateUI();
+  updateSkillsUI();
+}
+
+function selectOrigin(type) {
+  gameState.sorcererType = type;
+  DOM.originOverlay.style.display = "none";
+  recalc();
+  updateUI();
+  saveGame();
+}
+
+function updateLog(msg, type) {
+  let el = document.createElement("div");
+  el.className = type === 'player' ? 'log-p' : type === 'enemy' ? 'log-e' : 'log-sys';
+  el.innerText = `> ${msg}`;
+  if(DOM.log.children.length > 20) DOM.log.removeChild(DOM.log.lastChild);
+  DOM.log.prepend(el);
+}
+
+// ===== MATH & HELPERS =====
+function formatNumber(num) {
+  if (num >= 1e33) return (num / 1e33).toFixed(2) + "Dc";
+  if (num >= 1e30) return (num / 1e30).toFixed(2) + "No";
+  if (num >= 1e27) return (num / 1e27).toFixed(2) + "Oc";
+  if (num >= 1e24) return (num / 1e24).toFixed(2) + "Sp";
+  if (num >= 1e21) return (num / 1e21).toFixed(2) + "Sx";
+  if (num >= 1e18) return (num / 1e18).toFixed(2) + "Qi";
+  if (num >= 1e15) return (num / 1e15).toFixed(2) + "Qa";
+  if (num >= 1e12) return (num / 1e12).toFixed(2) + "T";
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + "k";
+  return Math.floor(num).toString();
+}
+
+function toggleAFK(mode) {
+  if (gameState.afkMode === mode) gameState.afkMode = null;
+  else gameState.afkMode = mode;
+  updateUI();
+}
+
+function getEnemyMitigation() {
+   if (!gameState.enemy || gameState.enemy.type === 'normal') return 1.0;
+   return Math.pow(1.05, gameState.bossLevel);
+}
+
+function getBodyTrainCost() {
+  return Math.floor(500 * Math.pow(1.5, gameState.bodyTrainingLevel));
+}
+
+function trainBody() {
+  let cost = getBodyTrainCost();
+  if (gameState.yen >= cost) {
+    gameState.yen -= cost;
+    gameState.bodyTrainingLevel++;
+    recalc();
+    updateUI();
+  }
+}
+
+function useRCT() {
+  let ceCost = Math.max(10, Math.floor(gameState.cursedEnergy * 0.1));
+  if (gameState.cursedEnergy >= ceCost && gameState.playerHp < gameState.playerMaxHp) {
+    gameState.cursedEnergy -= ceCost;
+    gameState.playerHp = Math.min(gameState.playerMaxHp, gameState.playerHp + (gameState.playerMaxHp * 0.5));
+    updateLog("You poured Cursed Energy into Reverse Cursed Technique. HP Restored!", "player");
+    recalc(); updateUI();
+  }
+}
+
+function getAllyCost(k) { return Math.floor(gameState.allies[k].baseCost * Math.pow(costMultiplier, gameState.allies[k].owned)); }
+function getGachaCost(type) {
+  let base = { 'technique': 200, 'weapon': 150, 'trait': 500, 'clan': 1000 }[type];
+  let gradeMult = gameState.grade === 4 ? 1 : gameState.grade === 3 ? 10 : gameState.grade === 2 ? 50 : 200;
+  return base * gradeMult;
+}
+function rollItem(arr) { let r = Math.random(), sum = 0; for (let i of arr) { sum += i.chance; if (r <= sum) return i; } return arr[0]; }
+function populateChances(eid, arr) { document.getElementById(eid).innerHTML = arr.filter(i => i.chance > 0).map(i => `<p><span class="${rarities[i.rarity].class}">${i.name}</span> <span>${(i.chance * 100).toFixed(3).replace(/\.?0+$/, '')}%</span></p>`).join(''); }
+function switchGacha(t) { document.querySelectorAll('.gacha-tab, .gacha-content').forEach(el => el.classList.remove('active')); event.target.classList.add('active'); document.getElementById(`gacha-${t}`).classList.add('active'); }
+
+// Combat Skills UI
+function updateSkillsUI() {
+  let container = document.getElementById('active-skills-container');
+  if (!container) return;
+  if (!gameState.cooldowns) gameState.cooldowns = {};
+  
+  if (!gameState.equippedSkills) gameState.equippedSkills = [ {type:'t',id:1}, {type:'t',id:2}, null, null ];
+  // Heian Era Sukuna: 5th skill slot at 20 fingers
+  let maxSlots = gameState.sukunaFingers >= 20 ? 5 : 4;
+  while (gameState.equippedSkills.length < maxSlots) gameState.equippedSkills.push(null);
+  let newHtml = "";
+  
+  for (let sIdx = 0; sIdx < maxSlots; sIdx++) {
+    let slot = gameState.equippedSkills[sIdx];
+    if (!slot) {
+      newHtml += `<button class="skill-btn" style="border:1px dashed #444; background:transparent; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer;" onclick="openSwapModal(${sIdx})">
+         <span style="font-size:11px; color:#666;">[Empty Slot]<br/>⚙️ Equip</span>
+      </button>`;
+      continue;
+    }
+    
+    let sk = null; let borderCol = '#444'; let prefix = '';
+    if (slot.type === 't' && gameState.technique) { sk = gameState.technique['skill' + slot.id]; if(sk && sk.col) borderCol=sk.col; }
+    if (slot.type === 'w' && gameState.weapon && gameState.weapon.level >= 5) { sk = gameState.weapon.wSkill; borderCol='#ff3366'; prefix = '[WEP] '; }
+    
+    if (sk) {
+      let cdKey = slot.type + '_skill' + (slot.type === 't' ? slot.id : '');
+      let cdVar = gameState.cooldowns[cdKey] || 0;
+      let readyStr = cdVar > 0 ? 'disabled' : '';
+      let width = sk.cd ? `${((sk.cd - cdVar) / sk.cd) * 100}%` : '100%';
+      let textCol = sk.col || '#fff';
+      newHtml += `<button class="skill-btn" ${readyStr} style="border-color:${borderCol}; position:relative; overflow:hidden;">
+         <span style="font-size:11px; position:relative; z-index:2; color:${textCol}; text-shadow:1px 1px 2px #000;">${prefix}${sk.n}</span>
+         <div class="skill-cooldown" style="width:${width}; background:${borderCol};"></div>
+         <div onclick="openSwapModal(${sIdx}); event.stopPropagation();" style="position:absolute; top:2px; right:2px; font-size:12px; cursor:pointer; background:rgba(0,0,0,0.8); padding:0 3px; border-radius:3px; z-index:10;">⚙️</div>
+         <div onclick="useSkill(${sIdx})" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5;"></div>
+      </button>`;
+    } else {
+      newHtml += `<button class="skill-btn" style="border:1px dashed #444; background:transparent; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer;" onclick="openSwapModal(${sIdx})">
+         <span style="font-size:11px; color:#ff4444;">[Locked]<br/>⚙️ Swap</span>
+      </button>`;
+    }
+  }
+  container.innerHTML = newHtml;
+}
+
+function openSwapModal(slotIdx) {
+  gameState.swapTargetSlot = slotIdx;
+  document.getElementById('swap-slot-id').innerText = (slotIdx + 1);
+  let html = "";
+  
+  if (gameState.technique) {
+    let tLvl = gameState.technique.level || 1;
+    for (let i = 1; i <= 6; i++) {
+      let sk = gameState.technique['skill' + i];
+      if (sk) {
+        let reqLvl = i===1||i===2 ? 1 : i===3 ? 10 : i===4 ? 25 : i===5 ? 40 : 50;
+        let isLocked = tLvl < reqLvl;
+        
+        let isEq = false;
+        for (let eq of gameState.equippedSkills) {
+          if (eq && eq.type === 't' && eq.id === i) isEq = true;
+        }
+
+        if (isLocked) {
+           html += `<button disabled style="padding:10px; text-align:left; background:#111; border:1px dashed #555; border-radius:5px; color:#555; cursor:not-allowed;">
+             <strong>[LOCKED] ${sk.n}</strong> (Unlocks at Tech Lv. ${reqLvl})
+           </button>`;
+        } else if (isEq) {
+           html += `<button disabled style="padding:10px; text-align:left; background:#222; border:1px solid ${sk.col || '#ff9900'}; border-radius:5px; color:${sk.col || '#ff9900'}; cursor:not-allowed; opacity:0.6;">
+             <strong>[Already Equipped] ${sk.n}</strong>
+           </button>`;
+        } else {
+           html += `<button onclick="assignSkill('t', ${i})" style="padding:10px; text-align:left; background:#222; border:1px solid ${sk.col || '#444'}; border-radius:5px; color:#fff; cursor:pointer; transition:border 0.2s;">
+             <strong>[Technique] <span style="color:${sk.col || '#fff'}; font-weight:bold; text-shadow:1px 1px 3px rgba(0,0,0,0.5);">${sk.n}</span></strong> (CD: ${sk.cd}s)<br/>
+             <span style="font-size:11px; color:#aaa;">${sk.log} Multiplier: x${sk.mult}</span>
+           </button>`;
+        }
+      }
+    }
+  }
+  
+  const w = gameState.weapon;
+  if (w && w.wSkill) {
+      let sk = w.wSkill;
+      let wLvl = w.level || 1;
+      let reqLvl = 5;
+      
+      let isEq = false;
+      for (let eq of gameState.equippedSkills) {
+        if (eq && eq.type === 'w') isEq = true;
+      }
+      
+      if (wLvl < reqLvl) {
+         html += `<button disabled style="padding:10px; text-align:left; background:#111; border:1px dashed #555; border-radius:5px; color:#555; cursor:not-allowed;">
+           <strong>[LOCKED] Weapon Art</strong> (Unlocks at Weapon Lv. 5)
+         </button>`;
+      } else if (isEq) {
+         html += `<button disabled style="padding:10px; text-align:left; background:#331111; border:1px solid #ff3366; border-radius:5px; color:#ff3366; cursor:not-allowed; opacity:0.6;">
+           <strong>[Already Equipped] ${sk.n}</strong>
+         </button>`;
+      } else {
+         html += `<button onclick="assignSkill('w', 1)" style="padding:10px; text-align:left; background:#331111; border:1px solid #ff3366; border-radius:5px; color:#fff; cursor:pointer; transition:border 0.2s;">
+           <strong>[Weapon Art] ${sk.n}</strong> (CD: ${sk.cd}s)<br/>
+           <span style="font-size:11px; color:#aaa;">${sk.log} Multiplier: x${sk.mult}</span>
+         </button>`;
+      }
+  }
+  
+  html += `<button onclick="assignSkill(null, null)" style="padding:10px; background:#444; border:none; border-radius:5px; color:#fff; cursor:pointer;">Unequip Slot</button>`;
+  
+  document.getElementById('swapList').innerHTML = html;
+  document.getElementById('skill-swap-overlay').style.display = 'flex';
+}
+
+function assignSkill(type, id) {
+  if (!type) {
+    gameState.equippedSkills[gameState.swapTargetSlot] = null;
+  } else {
+    gameState.equippedSkills[gameState.swapTargetSlot] = { type: type, id: id };
+  }
+  document.getElementById('skill-swap-overlay').style.display = 'none';
+  saveGame(); updateSkillsUI();
+}
+
+function useSkill(slotIdx, isEcho = false) {
+  if (gameState.playerStunned && gameState.playerStunned > 0) return; // Cannot cast while stunned
+  if (!gameState.enemy) return;
+  const slot = gameState.equippedSkills[slotIdx];
+  if (!slot) return;
+  const isSixEyes = gameState.trait && gameState.trait.name === "The Six Eyes";
+  if (!gameState.cooldowns) gameState.cooldowns = {};
+  
+  if (slot.type === 't') {
+    const t = gameState.technique;
+    if (!t) return;
+    let sk = t['skill' + slot.id];
+    let cdKey = 't_skill' + slot.id;
+    if (sk && (gameState.cooldowns[cdKey] || 0) <= 0) {
+      let baseCd = isSixEyes ? Math.max(1, Math.floor(sk.cd / 2)) : sk.cd;
+      if (gameState.sukunaFingers >= 20) baseCd = Math.max(1, Math.floor(baseCd * 0.75));
+      gameState.cooldowns[cdKey] = baseCd;
+      let skillMult = sk.mult * (gameState.sukunaFingers >= 10 ? 1.5 : 1.0);
+      let d = gameState.playerDamage * skillMult;
+      // Uro: 40% dodge on skills, reduced by Domain Amplification
+      let dodgeChance = 0.40;
+      if (gameState.gpShop?.domainamplify) dodgeChance -= 0.20;
+      if (gameState.enemy.mechanic === 'uro' && Math.random() < dodgeChance) {
+        updateLog("Uro bends the sky — your attack missed!", 'enemy');
+      } else {
+        d = d / getEnemyMitigation();
+        gameState.enemy.hp -= d;
+      }
+      
+      // Unique Phase 1 Technique Interactions
+      if (t.name === "Cursed Speech") {
+         let recoil = gameState.playerMaxHp * (0.02 + (slot.id * 0.02)); 
+         gameState.playerHp -= recoil;
+         updateLog(`*COUGH* Cursed Speech rips your throat for ${formatNumber(recoil)} DMG!`, 'enemy');
+      }
+      if (t.name === "Projection Sorcery") {
+         for (let k in gameState.cooldowns) { if(k !== cdKey && gameState.cooldowns[k] > 0) gameState.cooldowns[k] -= 2; }
+      }
+      if (t.name === "Angel's Extinguishment" && Math.random() < 0.2) {
+         updateLog(`Jacob's Ladder scorches their Cursed Energy!`, 'sys');
+      }
+
+      updateLog(sk.log + ` (${formatNumber(d)} DMG)`, 'player');
+      showFloaty("-" + formatNumber(d), true, true);
+      gameState.cursedEnergy += (gameState.cePerClick * (slot.id === 2 ? 5 : 2));
+    }
+  } else if (slot.type === 'w') {
+    const w = gameState.weapon;
+    if (!w || !w.wSkill) return;
+    let cdKey = 'w_skill';
+    if ((gameState.cooldowns[cdKey] || 0) <= 0) {
+      let baseCd = isSixEyes ? Math.max(1, Math.floor(w.wSkill.cd / 2)) : w.wSkill.cd;
+      if (gameState.sukunaFingers >= 20) baseCd = Math.max(1, Math.floor(baseCd * 0.75));
+      gameState.cooldowns[cdKey] = baseCd;
+      let weapMult = w.wSkill.mult * (gameState.sukunaFingers >= 10 ? 1.5 : 1.0);
+      let d = gameState.playerDamage * weapMult / getEnemyMitigation();
+      gameState.enemy.hp -= d;
+      updateLog(w.wSkill.log + ` (${formatNumber(d)} WEAPON DMG)`, 'player');
+      showFloaty("-" + formatNumber(d), true, true);
+    }
+  }
+  
+  if (checkMemoria("Judgment Chain") && Math.random() < 0.20) {
+      gameState.enemyStunned = 2; // GameTicks
+      updateLog("JUDGMENT CHAIN! The enemy is temporarily bound!", "sys");
+  }
+  if (!isEcho && checkMemoria("Void Echo") && Math.random() < 0.10) {
+      updateLog("VOID ECHO! The cursed technique repeats itself!", "sys");
+      setTimeout(() => useSkill(slotIdx, true), 300);
+  }
+
+  if (gameState.enemy.hp <= 0) defeatEnemy();
+  updateUI(); updateSkillsUI();
+}
+
+// ===== COMBAT & CLICK EVENTS =====
+function clickEnergy() {
+  if (gameState.playerStunned && gameState.playerStunned > 0) return; // Cannot attack while stunned
+  gameState.stats.clicks++;
+  
+  if (checkMemoria("Combo Drive")) {
+     gameState.comboDriveStacks = (gameState.comboDriveStacks || 0) + 1;
+     recalc();
+  }
+  if (checkMemoria("Flowing Force")) {
+     gameState.flowingForceClicks = (gameState.flowingForceClicks || 0) + 1;
+     if (gameState.flowingForceClicks >= 5) {
+        gameState.flowingForceClicks = 0;
+        for (let k in gameState.cooldowns) { if (gameState.cooldowns[k] > 0) gameState.cooldowns[k]--; }
+        updateSkillsUI();
+     }
+  }
+  
+  let crit = Math.random() < 0.1;
+  let dmgGain = crit ? gameState.playerDamage * 3 : gameState.playerDamage;
+  gameState.cursedEnergy += gameState.cePerClick; 
+  
+  if(gameState.enemy && gameState.enemy.hp > 0) {
+    // Uro: 40% dodge chance, reduced by Domain Amplification (GP Shop)
+    let dodgeChance = 0.40;
+    if (gameState.gpShop?.domainamplify) dodgeChance -= 0.20;
+    if (gameState.enemy.mechanic === 'uro' && Math.random() < dodgeChance) {
+      showFloaty("DODGED! (Sky Manipulation)", false, false);
+    } else {
+      let mitigatedDmg = dmgGain / getEnemyMitigation();
+      gameState.enemy.hp -= mitigatedDmg;
+      showFloaty("-" + formatNumber(mitigatedDmg), crit, true);
+    }
+    if (gameState.enemy.hp <= 0) defeatEnemy();
+  }
+  showFloaty("+" + formatNumber(gameState.cePerClick) + " CE", crit, false);
+  updateUI();
+}
+
+function showFloaty(text, isCrit, isDamage) {
+  let el = document.createElement("div"); el.className = "damage-popup";
+  el.innerText = (isCrit && isDamage ? "BLACK FLASH! " : (isCrit && !isDamage ? "CRIT! " : "")) + text;
+  el.style.left = (Math.random() * 40 + 30) + "%"; el.style.top = (Math.random() * 30 + 30) + "%";
+  
+  if (isCrit && isDamage) { 
+    gameState.stats.blackFlashes++;
+    el.style.color = "#ff0000"; el.style.fontSize = "26px"; 
+    // Flash Screen!
+    let flash = document.createElement("div"); flash.className = "black-flash-screen";
+    document.body.appendChild(flash); setTimeout(() => flash.remove(), 250);
+  } else if (isDamage) { 
+    el.style.color = "#ffb3ba"; 
+  } else { 
+    el.style.color = "#a366ff"; 
+  }
+  DOM.popupContainer.appendChild(el); setTimeout(() => el.remove(), 800);
+}
+
+// LOGARITHMIC DIMINISHING CAP
+function getCEPowerMultiplier() {
+  if (gameState.activeVow === 'poverty' && gameState.isBossFight) return 1; 
+  if (gameState.trait && gameState.trait.name === "Heavenly Restricted") return 1; 
+  let ce = Math.max(0, gameState.cursedEnergy);
+  return 1 + (Math.log10((ce / 50) + 1) * 2); 
+}
+
+function buyOriginChange() {
+  if (gameState.yen >= 1000000000000) {
+    gameState.yen -= 1000000000000;
+    DOM.originOverlay.style.display = "flex";
+  } else {
+    showFloaty("Insufficient Yen (Need 1T)!", false, false);
+  }
+}
+
+function openBlackMarket() { 
+  updateBlackMarketUI();
+  document.getElementById('black-market-overlay').style.display = 'flex'; 
+}
+
+function rebirthPrestige() {
+  if (gameState.yen < 5000000) return;
+  
+  let confirmRebirth = confirm("WARNING: Reincarnation completely wipes your Yen, Grade, Boss Level, Cursed Energy, and Body Training! You keep your Inventory, Secrets, and Pity. You will gain a permanent prestige multiplier and unlock the Memoria system! Proceed?");
+  if (!confirmRebirth) return;
+  
+  gameState.rebirths = (gameState.rebirths || 0) + 1;
+  gameState.yen = 0; gameState.cursedEnergy = 0;
+  gameState.bossLevel = 0; gameState.bodyTrainingLevel = 0;
+  gameState.grade = 4;
+  gameState.sorcererType = null;
+  gameState.equippedSkills = [ {type:'t',id:1}, {type:'t',id:2}, null, null ];
+  
+  // Flash Screen!
+  let flash = document.createElement("div"); flash.className = "black-flash-screen";
+  flash.style.background = "rgba(255,255,255,1)";
+  document.body.appendChild(flash); setTimeout(() => flash.remove(), 1000);
+
+  showFloaty("REINCARNATION SUCCESSFUL!", true, false);
+  updateLog("Your soul has transcended. Time begins anew.", "sys");
+  
+  document.getElementById('boss-level').innerText = "Tokyo Suburbs (Lv. 0)";
+  recalc(); updateUI(); updateSkillsUI(); saveGame();
+}
+
+function startRaid() {
+  if (gameState.grade > 1) return;
+  if (gameState.playerHp < gameState.playerMaxHp * 0.5) { updateLog("You need at least 50% HP to start a Raid!", "sys"); return; }
+  gameState.isBossFight = true;
+  gameState.isRaid = true;
+  gameState.isCullingGame = false;
+  
+  let scale = 5;
+  let scalingFactor = 1 + (gameState.bossLevel * 0.35);
+  let baseHp = 500000 * Math.pow(4, scale - 1) * scalingFactor * 8; // 8x HP over regular bosses (Nerfed)
+  
+  let pool = ["Rika Orimoto (Vengeful)", "Mahoraga", "Full Power Sukuna", "Kenjaku (Ascended)", "Toji Fushiguro (Resurrected)", "Yuta Okkotsu (Unleashed)", "Gojo Satoru (Unsealed)", "Merged Beast Tengen"];
+  let bName = pool[Math.floor(Math.random() * pool.length)];
+
+  gameState.enemy = { 
+    name: bName + " (RAID BOSS)", hp: baseHp, maxHp: baseHp, type: "raid",
+    rewardYen: 750000 * Math.pow(3, scale - 1) * scalingFactor, // 3x yen reward
+    dmg: 250 * (1 + scale * 0.5) * (1 + (gameState.bossLevel * 0.15)) * 5 // 5x Base DMG
+  };
+  
+  if (gameState.activeVow) gameState.vowTimer = 0;
+  DOM.bossBtn.innerText = "Flee from Raid"; DOM.bossBtn.style.background = "#555";
+  recalc(); updateUI(); updateSkillsUI();
+}
+
+function updateBlackMarketUI() {
+  let hpOwned = Math.round((gameState.bmHpBuff || 0) / 0.10);
+  let ceOwned = Math.round((gameState.bmCeBuff || 0) / 0.05);
+  let autoOwned = gameState.bmAutoClicker ? "MAX" : "0";
+  
+  document.getElementById('bm-btn-ce').innerHTML = `+5% Cursed Energy Output (Owned: ${ceOwned})<br><span style="color:#ffcc00; font-size:11px;">Cost: ¥1,000,000,000 (1B)</span>`;
+  document.getElementById('bm-btn-hp').innerHTML = `+10% Max HP (Owned: ${hpOwned})<br><span style="color:#ffcc00; font-size:11px;">Cost: ¥1,000,000,000 (1B)</span>`;
+  document.getElementById('bm-btn-auto').innerHTML = `Auto-Channel CE Tick (Owned: ${autoOwned})<br><span style="color:#ffcc00; font-size:11px;">Cost: ¥50,000,000,000 (50B)</span>`;
+  if (gameState.bmAutoClicker) document.getElementById('bm-btn-auto').disabled = true;
+}
+
+function buyBlackMarket(type) {
+  let costs = { 'ce': 1000000000, 'hp': 1000000000, 'auto': 50000000000 };
+  if (gameState.yen >= costs[type]) {
+    gameState.yen -= costs[type];
+    if (type === 'ce') { gameState.bmCeBuff = (gameState.bmCeBuff || 0) + 0.05; }
+    if (type === 'hp') { gameState.bmHpBuff = (gameState.bmHpBuff || 0) + 0.10; }
+    if (type === 'auto') { gameState.bmAutoClicker = true; }
+    showFloaty("Purchase Successful!", false, false);
+    updateBlackMarketUI();
+    recalc(); updateUI(); saveGame();
+  } else showFloaty("Too broke!", false, false);
+}
+
+function recalc() {
+  let baseYenPerSec = 0;
+  for (let key in gameState.allies) if (gameState.allies[key].unlockGrade >= gameState.grade) baseYenPerSec += gameState.allies[key].owned * gameState.allies[key].production;
+
+  let scale = (5 - gameState.grade + 1);
+  let baseDamage = ((10 * scale) + (gameState.bodyTrainingLevel * 25)) * (1 + (gameState.sukunaFingers * 1.0)); 
+
+  let ceClickBase = 5 * scale; 
+  let originCeMult = 1;
+  let baseHp = ((100 * scale) + (gameState.bodyTrainingLevel * 50)) * (1 + (gameState.sukunaFingers * 1.0)); 
+  
+  let achBuffs = getAchievementBuffs();
+  let prestigeMult = 1 + (gameState.stats.timesPrestaged * 2.5) + (gameState.grade === 1 ? 5 : 0) + ((gameState.rebirths || 0) * 15.0);
+  if (gameState.sukunaFingers >= 15) prestigeMult *= 2; // True Incarnation
+  
+  // Apply squished active modifiers!
+  let tLvl = gameState.technique ? (gameState.technique.level || 1) : 1;
+  let wLvl = gameState.weapon ? (gameState.weapon.level || 1) : 1;
+  let trLvl = gameState.trait ? (gameState.trait.level || 1) : 1;
+  let cLvl = gameState.clan ? (gameState.clan.level || 1) : 1;
+  
+  let tBuff = (gameState.technique?.dmgBuff || 0) * (1 + (tLvl * 0.2));
+  let trBuff = (gameState.trait?.dmgBuff || 0) * (1 + (trLvl * 0.2));
+  let cBuff = (gameState.clan?.dmgBuff || 0) * (1 + (cLvl * 0.2));
+
+  let dmgMem = 1.0; let hpMem = 1.0;
+  if (checkMemoria("Iron Will")) hpMem += 1.5;
+  if (checkMemoria("Combo Drive")) dmgMem += ((gameState.comboDriveStacks || 0) * 0.01);
+  if (checkMemoria("Battle Instinct") && gameState.playerHp < (baseHp * hpMem) * 0.5) dmgMem += 1.0;
+  if (checkMemoria("Heaven's Debt")) dmgMem += 20.0;
+
+  let dmgMult = (1 + tBuff + trBuff + cBuff + achBuffs.dmg + (gameState.bmCeBuff || 0)) * prestigeMult * dmgMem;
+  // GP Shop: Colony Barrier Fragment (+200% Max HP per owned)
+  let gpBarrierBuff = (gameState.gpShop?.barrier || 0) * 2.0;
+  let hpMult = (1 + ((gameState.trait?.hpBuff || 0) * (1 + trLvl * 0.2)) + ((gameState.clan?.hpBuff || 0) * (1 + cLvl * 0.2)) + achBuffs.hp + (gameState.bmHpBuff || 0) + gpBarrierBuff) * prestigeMult * hpMem;
+  let flatDmg = (gameState.weapon?.dmgBonus || 0) * (1 + (wLvl * 0.5));
+  if (wLvl >= 5 && gameState.weapon) dmgMult *= (1 + ((wLvl - 5) * 0.005));
+  let yenMult = (1 + achBuffs.yen) * (1 + (gameState.sukunaFingers * 1.0));
+  // GP Shop: Kogane's Blessing (+500% Ally Yen)
+  if (gameState.gpShop?.kogane) yenMult += 5.0;
+
+  if (gameState.sorcererType) {
+    if (gameState.sorcererType === "Modern Sorcerer") originCeMult = 1.20;
+    if (gameState.sorcererType === "Ancient Sorcerer") hpMult += 0.50;
+    if (gameState.sorcererType === "Curse User") yenMult += 0.20;
+    if (gameState.sorcererType === "Incarnated Sorcerer") dmgMult += 0.25;
+  }
+  if (gameState.trait && gameState.trait.name === "Monarch") {
+    let monarchBuff = (gameState.monarchStacks * 0.02); 
+    dmgMult += monarchBuff; hpMult += monarchBuff;
+  }
+  if (gameState.activeVow === 'execution' && gameState.isBossFight) dmgMult += 10.0; 
+  if (gameState.activeVow === 'supremacy' && (gameState.isBossFight || gameState.isCullingGame) && gameState.vowTimer < 3) dmgMult += 50.0; 
+
+  gameState.cePerClick = ceClickBase * originCeMult; 
+  gameState.yenPerSec = baseYenPerSec * yenMult;
+  gameState.playerDamage = ((baseDamage + flatDmg) * dmgMult * getCEPowerMultiplier()); 
+  
+  gameState.playerMaxHp = baseHp * hpMult;
+  if (gameState.playerHp > gameState.playerMaxHp) gameState.playerHp = gameState.playerMaxHp;
+  DOM.hpBuffs.innerText = formatNumber((hpMult - 1) * 100);
+  DOM.ceClickVal.innerText = formatNumber(gameState.cePerClick);
+}
+
+function toggleBoss() {
+  if (gameState.isBossFight) {
+    updateLog("Retreated from the Boss.", "sys"); spawnEnemy(false);
+  } else {
+    if (gameState.playerHp < gameState.playerMaxHp * 0.2) { updateLog("You are too injured to fight a Boss!", "sys"); return; }
+    updateLog("Challenging Local Curse!", "sys"); spawnEnemy(true);
+  }
+}
+
+function spawnEnemy(isBoss) {
+  gameState.isBossFight = isBoss;
+  let scale = (5 - gameState.grade + 1);
+  if (isBoss) {
+    let scalingFactor = 1 + (gameState.bossLevel * 0.35);
+    let baseHp = 500000 * Math.pow(4, scale - 1) * scalingFactor; // 5x base HP
+    
+    let pool = [];
+    if (gameState.grade === 4) pool = ["Fly Head Swarm", "Roppongi Curse", "Finger Bearer", "Smallpox Deity"];
+    if (gameState.grade === 3) pool = ["Kechizu", "Eso", "Choso", "Finger Bearer"];
+    if (gameState.grade === 2) pool = ["Jogo", "Hanami", "Dagon", "Mahito", "Kurourushi"];
+    if (gameState.grade === 1) pool = ["Suguru Geto", "Uraume", "Toji Fushiguro", "Hajime Kashimo", "Kenjaku", "Ryomen Sukuna"];
+    let bName = pool[Math.floor(Math.random() * pool.length)];
+
+    gameState.enemy = { 
+      name: bName + " (BOSS)", hp: baseHp, maxHp: baseHp, type: "boss",
+      rewardYen: 15000 * Math.pow(3, scale - 1) * scalingFactor, 
+      dmg: 250 * (1 + scale * 0.5) * (1 + (gameState.bossLevel * 0.15)) // Scaled-up Boss DMG threshold
+    };
+    if (gameState.activeVow) gameState.vowTimer = 0; 
+    DOM.bossBtn.innerText = "Retreat from Boss"; DOM.bossBtn.style.background = "#555";
+  } else {
+    let baseHp = 300 * Math.pow(2, scale - 1); 
+    gameState.enemy = { 
+      name: "Cursed Spirit (Safe)", hp: baseHp, maxHp: baseHp, type: "normal",
+      rewardYen: 100 * Math.pow(2, scale - 1), dmg: 5 * (1 + scale * 0.3) 
+    };
+    gameState.activeVow = null; 
+    gameState.isRaid = false;
+    DOM.bossBtn.innerText = "Threaten Curse (Spawn Boss)"; DOM.bossBtn.style.background = "#ff4d6d";
+  }
+  recalc(); updateUI(); updateSkillsUI();
+}
+
+function startCullingGames() {
+  if (gameState.grade > 1) return;
+  gameState.isCullingGame = true;
+  gameState.cullingTimer = gameState.gpShop?.extension ? 90 : 60; // Extension: 90s Culling Timer
+  gameState.cullingAttackCount = 0; // For Ryu's mechanic
+  
+  let scalingFactor = 1 + (gameState.bossLevel * 0.35);
+  let isElite = Math.random() < 0.40;
+  
+  if (isElite) {
+    // Strong Canon Sorcerer (40% chance)
+    let elites = [
+      { name: "Hiromi Higuruma", mechanic: "higuruma" },
+      { name: "Hajime Kashimo", mechanic: "kashimo" },
+      { name: "Ryu Ishigori", mechanic: "ryu" },
+      { name: "Takako Uro", mechanic: "uro" },
+      { name: "Reggie Star", mechanic: "reggie" }
+    ];
+    let chosen = elites[Math.floor(Math.random() * elites.length)];
+    let eliteHp = 500000000 * scalingFactor; // 500M base — scales into billions
+    gameState.enemy = {
+      name: chosen.name + " (Culling Player)", hp: eliteHp, maxHp: eliteHp, type: "culling",
+      mechanic: chosen.mechanic,
+      rewardYen: 5000000 * Math.pow(1.5, gameState.bossLevel),
+      dmg: 500 * (1 + (gameState.bossLevel * 0.3)) * (1 + (gameState.stats.timesPrestaged * 0.5))
+    };
+    updateLog(`ELITE PLAYER: ${chosen.name} enters the colony!`, "sys");
+  } else {
+    // Weak Generic Player (60% chance)
+    let weakNames = ["Tokyo Colony Player", "Sendai Colony Player", "Tokyo No.2 Player", "Sakurajima Colony Player", "Awakened Non-Sorcerer"];
+    let wName = weakNames[Math.floor(Math.random() * weakNames.length)];
+    let weakHp = 5000000 * Math.pow(1.2, gameState.bossLevel) * (1 + (gameState.bossLevel * 0.3));
+    gameState.enemy = {
+      name: wName + " (Culling Player)", hp: weakHp, maxHp: weakHp, type: "culling",
+      mechanic: null,
+      rewardYen: 1000000 * Math.pow(1.5, gameState.bossLevel),
+      dmg: 200 * (1 + (gameState.bossLevel * 0.2))
+    };
+  }
+  DOM.bossBtn.innerText = "Forfeit Culling Games"; DOM.bossBtn.style.background = "#555";
+  recalc(); updateUI(); updateSkillsUI();
+}
+
+function toggleVow(vow) {
+  if (gameState.isBossFight) { updateLog("Cannot change Vows during a boss fight!", "sys"); return; }
+  gameState.activeVow = gameState.activeVow === vow ? null : vow;
+  document.querySelectorAll('.vow-btn').forEach(el => el.classList.remove('active'));
+  if (gameState.activeVow === 'execution') document.getElementById('vowExec').classList.add('active');
+  if (gameState.activeVow === 'poverty') document.getElementById('vowPov').classList.add('active');
+  if (gameState.activeVow === 'supremacy') document.getElementById('vowSupremacy').classList.add('active');
+  recalc();
+}
+
+function defeatEnemy() {
+  if (checkMemoria("Combo Drive")) gameState.comboDriveStacks = 0;
+
+  let reward = gameState.enemy.rewardYen;
+  if (gameState.trait && gameState.trait.name === "Fortune") reward *= 3;
+  if (gameState.sorcererType === "Curse User") reward *= 1.20; 
+  if (gameState.activeVow === 'poverty' && gameState.isBossFight) reward *= 10;
+  
+  gameState.stats.totalYen += reward;
+  gameState.yen += reward;
+  
+  if (gameState.isCullingGame) {
+     gameState.stats.cullingDefeated = (gameState.stats.cullingDefeated || 0) + 1;
+     gameState.cullingPoints++;
+     gameState.bossLevel++;
+     gameState.isCullingGame = false;
+     updateLog("Won Culling Game! +1 GP", "sys");
+     spawnEnemy(false);
+  } else if (gameState.isRaid) {
+     // Memoria Shard drop (25%, 1-3)
+     if (Math.random() < 0.25) { 
+        let drops = Math.floor(Math.random() * 3) + 1; 
+        gameState.memoriaShards = (gameState.memoriaShards || 0) + drops;
+        updateLog(`RAID EXORCISED! The curse left behind ${drops} Memoria Shard(s)!`, "sys");
+     } else {
+        updateLog(`RAID EXORCISED! (No Memoria Shards retrieved)`, "sys");
+     }
+
+     gameState.stats.bossesDefeated++;
+     gameState.stats.raidsDefeated = (gameState.stats.raidsDefeated || 0) + 1;
+     gameState.isRaid = false;
+     spawnEnemy(false);
+  } else if (gameState.isBossFight) {
+    gameState.stats.bossesDefeated++;
+    gameState.bossLevel++;
+    if (gameState.trait && gameState.trait.name === "Monarch") gameState.monarchStacks += 1;
+    gameState.activeVow = null; document.querySelectorAll('.vow-btn').forEach(el => el.classList.remove('active'));
+    spawnEnemy(false);
+  } else {
+    spawnEnemy(false);
+  }
+  gameState.playerStunned = 0;
+  recalc(); 
+}
+
+function exorcised() {
+  updateLog("YOU WERE EXORCISED! (Died)", 'sys');
+  let penaltyYen = gameState.yen * (checkMemoria("Heaven's Debt") ? 0.55 : 0.3); let penaltyCe = gameState.cursedEnergy * 0.3;
+  gameState.yen -= penaltyYen; gameState.cursedEnergy -= penaltyCe;
+  if (gameState.bossLevel > 0) gameState.bossLevel--; 
+  gameState.playerHp = gameState.playerMaxHp; 
+  updateLog(`Lost ¥${formatNumber(penaltyYen)} and ${formatNumber(penaltyCe)} CE!`, 'sys');
+  gameState.activeVow = null; document.querySelectorAll('.vow-btn').forEach(el => el.classList.remove('active'));
+  gameState.playerStunned = 0;
+  spawnEnemy(false); 
+}
+
+function gameTick() {
+  gameState.yen += gameState.yenPerSec; 
+  if (gameState.bmAutoClicker) {
+     gameState.cursedEnergy += Math.max(1, gameState.cePerClick);
+     if (gameState.enemy && gameState.enemy.hp > 0) {
+        let mitigatedDmg = (gameState.playerDamage * 0.5) / getEnemyMitigation();
+        gameState.enemy.hp -= mitigatedDmg;
+        if (gameState.enemy.hp <= 0) defeatEnemy();
+     }
+  }
+  // Malevolent Shrine Passive (5+ Sukuna Fingers): 5% of boss MAX HP as true damage per tick
+  if (gameState.sukunaFingers >= 5 && gameState.enemy && gameState.enemy.hp > 0 && (gameState.isBossFight || gameState.isCullingGame)) {
+     let shrineDmg = gameState.enemy.maxHp * 0.05;
+     gameState.enemy.hp -= shrineDmg;
+     if (gameState.enemy.hp <= 0) defeatEnemy();
+  }
+  let regenRate = gameState.sorcererType === "Cursed Spirit" ? 0.15 : 0.05; 
+  if (gameState.playerHp < gameState.playerMaxHp) gameState.playerHp += (gameState.playerMaxHp * regenRate); 
+  if (!gameState.cooldowns) gameState.cooldowns = {};
+  for (let k in gameState.cooldowns) { if (gameState.cooldowns[k] > 0) gameState.cooldowns[k]--; }
+
+  if (gameState.isCullingGame) {
+    gameState.cullingTimer--;
+    if (gameState.cullingTimer <= 0) {
+      updateLog("Time ran out! Culling Games failed.", "sys");
+      gameState.isCullingGame = false; spawnEnemy(false);
+    }
+  }
+
+  if (gameState.playerStunned && gameState.playerStunned > 0) {
+      gameState.playerStunned--;
+  }
+
+  if (gameState.enemyStunned && gameState.enemyStunned > 0) {
+      gameState.enemyStunned--; 
+      return; // Skip boss attack strictly because of Judgment Chain
+  }
+
+  if (gameState.enemy && (gameState.isBossFight || gameState.isCullingGame)) {
+    // True Incarnation (15 Fingers): 30% chance boss skips their attack
+    if (gameState.sukunaFingers >= 15 && Math.random() < 0.30) {
+       // Boss flinches — attack skipped
+    } else {
+    let bossHit = gameState.enemy.dmg * (Math.random() * 0.5 + 0.8);
+    gameState.playerHp -= bossHit;
+    updateLog(`${gameState.enemy.name} struck you for ${formatNumber(bossHit)}!`, 'enemy');
+    
+    // Screen Shake Effect
+    document.body.classList.remove('shake');
+    void document.body.offsetWidth; // trigger reflow
+    document.body.classList.add('shake');
+
+    if (Math.random() < 0.1) {
+      updateLog(`${gameState.enemy.name} uses its Innate Technique!`, 'enemy');
+      let smult = gameState.isCullingGame ? 2.5 : (1.5 + (Math.random() * 0.5));
+      gameState.playerHp -= bossHit * smult;
+    }
+    
+    // Culling Games: Canon Sorcerer Mechanics
+    if (gameState.isCullingGame && gameState.enemy.mechanic) {
+      let mech = gameState.enemy.mechanic;
+      // Kashimo: Double attack
+      if (mech === 'kashimo') {
+        let hit2 = gameState.enemy.dmg * (Math.random() * 0.5 + 0.8);
+        gameState.playerHp -= hit2;
+        updateLog(`Kashimo strikes again instantly! (${formatNumber(hit2)})`, 'enemy');
+      }
+      // Higuruma: After 30 ticks, Executioner's Sword activates (3x damage)
+      if (mech === 'higuruma' && gameState.cullingTimer <= 30) {
+        gameState.playerHp -= bossHit * 2; // Extra 2x on top of the normal hit
+        if (gameState.cullingTimer === 30) updateLog("GUILTY! Higuruma's Executioner's Sword activates!", 'enemy');
+      }
+      // Ryu: Every 5th attack is a 5x crit
+      gameState.cullingAttackCount = (gameState.cullingAttackCount || 0) + 1;
+      if (mech === 'ryu' && gameState.cullingAttackCount % 5 === 0) {
+        let megaHit = gameState.enemy.dmg * 5;
+        gameState.playerHp -= megaHit;
+        updateLog(`Ryu charges Granite Blast! (${formatNumber(megaHit)} DMG)`, 'enemy');
+      }
+      // Reggie: Steals 5% of current Yen per hit
+      if (mech === 'reggie') {
+        let stolen = gameState.yen * 0.05;
+        gameState.yen -= stolen;
+        if (stolen > 1) updateLog(`Reggie's Receipt Technique steals ¥${formatNumber(stolen)}!`, 'enemy');
+      }
+    }
+    if (gameState.activeVow === 'execution') {
+      gameState.vowTimer++;
+      if (gameState.vowTimer >= 5) { 
+        if (gameState.trait && gameState.trait.name === "The Honored One") {
+           if (gameState.vowTimer === 5) updateLog("Vow Failed, but The Honored One refuses to die!", 'sys');
+        } else {
+           updateLog("VOW FAILED! Exorcism imminent...", 'sys'); gameState.playerHp = 0; 
+        }
+      }
+    }
+    
+    if (gameState.activeVow === 'supremacy') {
+      gameState.vowTimer++;
+      if (gameState.vowTimer === 3) {
+         updateLog("Vow of Supremacy exhaustion! Stunned for 5 seconds!", "sys");
+         gameState.playerStunned = 5;
+      }
+      if (gameState.vowTimer >= 8) {
+         updateLog("Vow of Supremacy complete.", "sys");
+         gameState.activeVow = null; document.querySelectorAll('.vow-btn').forEach(el => el.classList.remove('active'));
+      }
+    }
+    
+    if (gameState.playerHp <= 0) { exorcised(); document.body.classList.remove('shake'); }
+    } // end of boss-flinch else
+  }
+  
+  // AFK Auto-Farming & Skilling Logic
+  if (gameState.afkMode && gameState.playerHp >= (gameState.playerMaxHp * 0.5)) {
+    if (gameState.enemy && gameState.enemy.hp > 0 && gameState.enemy.type !== 'normal') {
+       // Auto-casting
+       if (gameState.equippedSkills) {
+          for (let i = 0; i < 4; i++) {
+             let sk = gameState.equippedSkills[i];
+             if (sk) {
+                let cdKey = sk.type === 't' ? 't_skill' + sk.id : 'w_skill';
+                if ((gameState.cooldowns[cdKey] || 0) <= 0) {
+                   useSkill(i);
+                }
+             }
+          }
+       }
+    } else if (!gameState.enemy || gameState.enemy.type === 'normal') {
+       // Auto-spawning
+       if (gameState.afkMode === 'boss') spawnEnemy(true);
+       else if (gameState.afkMode === 'culling') startCullingGames();
+       else if (gameState.afkMode === 'raid') startRaid();
+    }
+  }
+
+  recalc(); updateUI(); updateSkillsUI();
+}
+
+// ===== GACHA PITY SYSTEM =====
+function rollGacha(type) {
+  let cost = getGachaCost(type);
+  if (gameState.yen < cost) return;
+
+  gameState.yen -= cost;
+
+  // Increment Trackers Tracker
+  if (gameState.pity[type].s === undefined) gameState.pity[type].s = 0;
+  gameState.pity[type].l++;
+  gameState.pity[type].m++;
+  gameState.pity[type].s++;
+
+  let result = null;
+  let dataArray = type === 'technique' ? techniques : type === 'weapon' ? weapons : type === 'trait' ? traits : clansArray;
+
+  // Force Pity Roll Logic
+  let secrets = dataArray.filter(i => i.rarity === 'Secret');
+  if (gameState.pity[type].s >= 2500 && secrets.length > 0) {
+    result = secrets[Math.floor(Math.random() * secrets.length)];
+  } else if (gameState.pity[type].m >= 400) {
+    let mythics = dataArray.filter(i => i.rarity === 'Mythic');
+    result = mythics[Math.floor(Math.random() * mythics.length)];
+  } else if (gameState.pity[type].l >= 200) {
+    let legendaries = dataArray.filter(i => i.rarity === 'Legendary');
+    result = legendaries[Math.floor(Math.random() * legendaries.length)];
+  } else {
+    // Normal Roll
+    result = rollItem(dataArray);
+  }
+
+  // Reset Trackers
+  if (result.rarity === 'Secret') {
+    gameState.pity[type].s = 0;
+    gameState.pity[type].m = 0;
+    gameState.pity[type].l = 0;
+  } else if (result.rarity === 'Mythic') {
+    gameState.pity[type].m = 0;
+    gameState.pity[type].l = 0;
+  } else if (result.rarity === 'Legendary') {
+    gameState.pity[type].l = 0;
+  }
+
+  // Inventory Save Logic
+  let alreadyOwns = gameState.inventory[type].find(item => item.name === result.name);
+  if (!alreadyOwns) {
+    gameState.inventory[type].push(result);
+    // Auto-equip if slot is empty
+    if (!gameState[type]) {
+       equipItem(type, result.name);
+    } else {
+       showFloaty("Pulled " + result.name + "!", false, false);
+    }
+  } else {
+    // Duplicate pull compensation (20% refund)
+    showFloaty("Duplicate: " + result.name, false, false);
+    gameState.yen += Math.floor(cost * 0.2);
+  }
+  
+  recalc(); updateUI(); updateSkillsUI(); saveGame();
+}
+
+function equipItem(type, itemName) {
+  let item = gameState.inventory[type].find(i => i.name === itemName);
+  if (item) {
+    gameState[type] = item;
+    if (type === 'technique') {
+      gameState.skill1ReadyIn = 0; gameState.skill2ReadyIn = 0;
+      if (gameState.equippedSkills) {
+        for (let i = 0; i < 4; i++) {
+          if (gameState.equippedSkills[i] && gameState.equippedSkills[i].type === 't') {
+            if (!item['skill' + gameState.equippedSkills[i].id]) {
+              gameState.equippedSkills[i] = null;
+            }
+          }
+        }
+      }
+    }
+    recalc(); updateUI(); updateSkillsUI(); saveGame();
+  }
+}
+
+function mastery(type) {
+  let item = gameState[type];
+  if (!item) return;
+  item.level = item.level || 1;
+  let maxCap = type === 'weapon' ? 100 : 60;
+  if (item.level >= maxCap) {
+    showFloaty("Max Level Reached!", false, false);
+    return;
+  }
+  let cost = 100000 * Math.pow(1.25, item.level - 1); // 100k base, softer curve
+  if (gameState.yen >= cost) {
+    gameState.yen -= cost;
+    item.level++;
+    
+    // Sync level to the inventory array backup
+    if (gameState.inventory && gameState.inventory[type]) {
+       let invMatch = gameState.inventory[type].find(x => x.name === item.name);
+       if (invMatch) invMatch.level = item.level;
+    }
+
+    recalc(); updateUI(); updateSkillsUI(); saveGame();
+    showFloaty(item.name + " Lvl Up!", false, false);
+  }
+}
+
+function buyAlly(key) {
+  let cost = getAllyCost(key);
+  if (gameState.yen >= cost) { gameState.yen -= cost; gameState.allies[key].owned++; recalc(); updateUI(); saveGame(); }
+}
+
+function prestige() {
+  let reqYen = 500000 * Math.pow(10, 4 - gameState.grade);
+  if (gameState.yen >= reqYen && gameState.grade > 1) {
+    gameState.stats.timesPrestaged++;
+    gameState.grade--; gameState.yen = 0; gameState.cursedEnergy = 0; gameState.monarchStacks = 0; gameState.bossLevel = 0; 
+    gameState.bodyTrainingLevel = 0; 
+    
+    // Pity is preserved between runs since it's an overarching account mechanic!
+    gameState.weapon = null; gameState.trait = null;
+    for(let k in gameState.allies) gameState.allies[k].owned = 0;
+    
+    gameState.sorcererType = null; 
+    DOM.originOverlay.style.display = "flex";
+
+    recalc(); gameState.playerHp = gameState.playerMaxHp; spawnEnemy(false);
+    for (let key in gameState.allies) allyUIElements[key].card.style.display = gameState.allies[key].unlockGrade >= gameState.grade ? "flex" : "none";
+    updateUI(); saveGame(); updateLog("PROMOTED TO HIGHER GRADE!", "sys");
+  } else if (gameState.grade === 1) {
+    if (confirm("CURSED CYCLE RESET? You will lose all Yen, Grade, and Body Training, but gain 1 Sukuna Finger (Permanent +100% Base DMG and Yen) and unlock the Memoria Hub.")) {
+       gameState.sukunaFingers++;
+       gameState.rebirths = (gameState.rebirths || 0) + 1;
+       gameState.grade = 4; gameState.yen = 0; gameState.cursedEnergy = 0; gameState.monarchStacks = 0; gameState.bossLevel = 0;
+       gameState.bodyTrainingLevel = 0;
+       gameState.technique = null; gameState.weapon = null; gameState.trait = null; gameState.clan = null;
+       for(let k in gameState.allies) gameState.allies[k].owned = 0;
+       gameState.sorcererType = null; DOM.originOverlay.style.display = "flex";
+       recalc(); gameState.playerHp = gameState.playerMaxHp; spawnEnemy(false);
+       for (let key in gameState.allies) allyUIElements[key].card.style.display = gameState.allies[key].unlockGrade >= gameState.grade ? "flex" : "none";
+       updateUI(); saveGame(); updateLog("INCARNATION COMPLETE!", "sys");
+    }
+  }
+}
+
+// ===== RENDER =====
+function updateUI() {
+  DOM.yen.innerText = formatNumber(gameState.yen); DOM.energy.innerText = formatNumber(gameState.cursedEnergy);
+  DOM.cePowerMultiplier.innerText = formatNumber((getCEPowerMultiplier() - 1) * 100);
+  DOM.sec.innerText = formatNumber(gameState.yenPerSec); DOM.dmg.innerText = formatNumber(gameState.playerDamage);
+  DOM.grade.innerText = gameState.grade === 1 ? "Special Grade" : "Grade " + gameState.grade;
+  if (DOM.prestigeBtn) {
+    DOM.prestigeBtn.innerText = gameState.grade > 1 ? "Promote (Select New Origin)" : "Cursed Cycle Reset";
+  }
+
+  DOM.originDisplay.innerText = gameState.sorcererType ? gameState.sorcererType : "None";
+
+  DOM.endgameStats.style.display = (gameState.sukunaFingers > 0 || (gameState.rebirths || 0) > 0 || gameState.grade <= 1) ? "block" : "none";
+  DOM.fingersDisp.innerText = formatNumber(gameState.sukunaFingers);
+  DOM.cpDisp.innerText = formatNumber(gameState.cullingPoints);
+  let rebirthsEl = document.getElementById('rebirthsDisp');
+  if (rebirthsEl) rebirthsEl.innerText = formatNumber(gameState.rebirths || 0);
+  
+  let gpBtn = document.getElementById('gpShopBtn');
+  if (gpBtn) gpBtn.style.display = gameState.cullingPoints > 0 || Object.keys(gameState.gpShop || {}).length > 0 ? "block" : "none";
+  
+  let spVow = document.getElementById('vowSupremacy');
+  if (spVow) spVow.style.display = gameState.gpShop?.supremacy ? 'inline-block' : 'none';
+  
+  if (DOM.cullingBtn) {
+    DOM.cullingBtn.style.display = (gameState.grade <= 1 && !gameState.isBossFight && !gameState.isCullingGame) ? "inline-block" : "none";
+  }
+  if (DOM.awakenTssBtn) {
+    DOM.awakenTssBtn.style.display = gameState.tssUnlocked ? 'none' : 'block';
+  }
+
+  // Dynamic Background Stage
+  let bgClass = "bg-stage-0";
+  if (gameState.bossLevel >= 5) bgClass = "bg-stage-1";
+  if (gameState.bossLevel >= 15) bgClass = "bg-stage-2";
+  if (gameState.bossLevel >= 30) bgClass = "bg-stage-3";
+  if (gameState.bossLevel >= 50) bgClass = "bg-stage-4";
+  document.body.className = bgClass;
+
+  DOM.playerHpText.innerText = `${formatNumber(Math.max(0, gameState.playerHp))} / ${formatNumber(gameState.playerMaxHp)}`;
+  DOM.playerBar.style.width = Math.min(100, Math.max(0, (gameState.playerHp / gameState.playerMaxHp * 100))) + "%";
+  
+  DOM.trainBodyCost.innerText = formatNumber(getBodyTrainCost());
+  DOM.trainBodyBtn.disabled = gameState.yen < getBodyTrainCost();
+
+  DOM.tech.innerHTML = gameState.technique ? `<span class="${rarities[gameState.technique.rarity].class}">${gameState.technique.name} [Lv.${gameState.technique.level || 1}]</span>` : "None";
+  if (gameState.technique) {
+     DOM.techDesc.style.display = "block";
+     DOM.techDesc.innerHTML = `<span style="color:#fff;">[${gameState.technique.rarity}]</span> +${formatNumber(gameState.technique.dmgBuff*100)}% Base DMG. <br>• ${gameState.technique.skill1.n} (CD: ${gameState.technique.skill1.cd}s)<br>• ${gameState.technique.skill2.n} (CD: ${gameState.technique.skill2.cd}s)`;
+  } else DOM.techDesc.style.display = "none";
+
+  DOM.weapon.innerHTML = gameState.weapon ? `<span class="${rarities[gameState.weapon.rarity].class}">${gameState.weapon.name} [Lv.${gameState.weapon.level || 1}]</span>` : "None";
+  if (gameState.weapon) {
+     DOM.weapDesc.style.display = "block";
+     DOM.weapDesc.innerHTML = `<span style="color:#fff;">[${gameState.weapon.rarity}]</span> Flat +${formatNumber(gameState.weapon.dmgBonus)} Base DMG.`;
+  } else DOM.weapDesc.style.display = "none";
+
+  DOM.clan.innerHTML = gameState.clan ? `<span class="${rarities[gameState.clan.rarity].class}">${gameState.clan.name} [Lv.${gameState.clan.level || 1}]</span>` : "None";
+  if (gameState.clan) {
+     DOM.clanDesc.style.display = "block";
+     DOM.clanDesc.innerHTML = `<span style="color:#fff;">[${gameState.clan.rarity}]</span> +${formatNumber(gameState.clan.dmgBuff*100)}% DMG, +${formatNumber(gameState.clan.hpBuff*100)}% Max HP.`;
+  } else DOM.clanDesc.style.display = "none";
+
+  let memBtn = document.getElementById('memoriaHubBtn');
+  if (memBtn) memBtn.style.display = (gameState.sukunaFingers > 0 || (gameState.rebirths || 0) > 0 || (gameState.memoriaShards || 0) > 0) ? "block" : "none";
+  let shDisp = document.getElementById('shards-counter');
+  if (shDisp) {
+      shDisp.style.display = (gameState.sukunaFingers > 0 || (gameState.rebirths || 0) > 0 || (gameState.memoriaShards || 0) > 0) ? "inline-block" : "none";
+      shDisp.innerText = `Shards: ${formatNumber(gameState.memoriaShards || 0)}`;
+  }
+
+  ['technique', 'weapon', 'clan'].forEach(t => {
+     let bid = t === 'technique' ? 'masteryTech' : t === 'weapon' ? 'masteryWeap' : 'masteryClan';
+     let btn = document.getElementById(bid);
+     if (btn) {
+       if (gameState[t]) {
+          btn.style.display = "inline-block";
+          let lvl = gameState[t].level || 1;
+          let maxCap = t === 'weapon' ? 100 : 60;
+          if (lvl >= maxCap) {
+             btn.innerText = `Max Level`;
+             btn.disabled = true;
+          } else {
+             let cost = 100000 * Math.pow(1.25, lvl - 1);
+             btn.innerText = `Upgrade (¥${formatNumber(cost)})`;
+             btn.disabled = gameState.yen < cost;
+          }
+       } else btn.style.display = "none";
+     }
+  });
+  
+  if (gameState.trait) {
+    let extra = gameState.trait.name === "Monarch" ? ` <span style="font-size:10px; color:#ffcc00;">[Stacks: ${gameState.monarchStacks}]</span>` : "";
+    DOM.trait.innerHTML = `<span class="${rarities[gameState.trait.rarity].class}">${gameState.trait.name}</span>` + extra;
+    DOM.traitDesc.innerHTML = `<span style="color:#fff;">[${gameState.trait.rarity}]</span> ` + gameState.trait.desc;
+  } else {
+    DOM.trait.innerHTML = "None"; DOM.traitDesc.innerHTML = "No trait active. Spin to alter your fate.";
+  }
+
+  // Render Pity UI
+  ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
+    let el = document.getElementById(`pity-${t}`);
+    if (el) {
+      let sPity = gameState.pity[t].s === undefined ? 0 : gameState.pity[t].s;
+      el.innerHTML = `Leg: <span style="color:#ffcc00;">${gameState.pity[t].l}/200</span> | Mythic: <span style="color:#ff3333;">${gameState.pity[t].m}/400</span> | Sec: <span class="text-secret" style="font-size:10px;">${sPity}/2500</span>`;
+    }
+  });
+
+  if (gameState.enemy) {
+    if (gameState.enemy.type === 'normal') {
+       DOM.enemyNameDisplay.innerHTML = `Safe Area <span id="enemyLevel" style="color:#aaa; font-size:12px;">(Boss Lv. ${gameState.bossLevel || 0})</span>`;
+    } else {
+       let defMod = getEnemyMitigation();
+       let mitPerc = (1 - (1/defMod)) * 100;
+       let mitText = defMod > 1.01 ? `<br><span style="font-size:11px; color:#ff4d4d; font-weight:normal;">(Mitigating ${mitPerc.toFixed(1)}% of Damage)</span>` : "";
+       DOM.enemyNameDisplay.innerHTML = `${gameState.enemy.name} <span id="enemyLevel" style="color:#ffae42; font-size:14px;">(Lv. ${gameState.bossLevel})</span>${mitText}`;
+       if (gameState.isCullingGame) DOM.enemyNameDisplay.innerHTML = `${gameState.enemy.name} <span style="color:#00ffff; font-size:14px;">[Timer: ${gameState.cullingTimer}s]</span>${mitText}`;
+    }
+    DOM.enemyHpText.innerText = `${formatNumber(Math.max(0, gameState.enemy.hp))} / ${formatNumber(gameState.enemy.maxHp)}`;
+    DOM.enemyBar.style.width = Math.max(0, (gameState.enemy.hp / gameState.enemy.maxHp * 100)) + "%";
+  }
+
+  let y = gameState.yen;
+  for (let key in gameState.allies) {
+    if (gameState.allies[key].unlockGrade >= gameState.grade) {
+      let cost = getAllyCost(key);
+      if(allyUIElements[key]) {
+        allyUIElements[key].owned.innerText = gameState.allies[key].owned;
+        allyUIElements[key].cost.innerText = formatNumber(cost);
+        allyUIElements[key].btn.disabled = y < cost;
+      }
+    }
+  }
+
+  let prestigeReq = 500000 * Math.pow(10, 4 - gameState.grade);
+  let rebirthReq = 5000000; // 5M for rebirth
+
+  if (gameState.grade > 1) { 
+     DOM.prestigeBtn.innerText = `Promote (Req: ¥${formatNumber(prestigeReq)})`; 
+     DOM.prestigeBtn.disabled = y < prestigeReq; 
+     DOM.prestigeBtn.onclick = () => prestige();
+  } else { 
+     DOM.prestigeBtn.innerText = `Cursed Cycle Reset (Req: ¥${formatNumber(rebirthReq)})`; 
+     DOM.prestigeBtn.disabled = y < rebirthReq; 
+     DOM.prestigeBtn.onclick = () => rebirthPrestige();
+     DOM.prestigeBtn.style.background = "linear-gradient(45deg, #000, #ff0000)";
+     DOM.prestigeBtn.style.border = "1px solid #ff0000";
+  }
+  
+  let rBtn = document.getElementById('raidBtn');
+  if (rBtn) rBtn.style.display = (gameState.grade <= 1) ? "block" : "none";
+  let shardsCounter = document.getElementById('shards-counter');
+  if (shardsCounter) {
+      if (gameState.rebirths > 0) { shardsCounter.style.display = 'inline'; shardsCounter.innerText = `Shards: ${formatNumber(gameState.memoriaShards || 0)}`; }
+      else { shardsCounter.style.display = 'none'; }
+  }
+  
+  let originBtn = document.getElementById('changeOriginBtn');
+  if (originBtn) originBtn.style.display = (gameState.grade === 1) ? "inline-block" : "none";
+  let bmBtn = document.getElementById('blackMarketBtn');
+  if (bmBtn) bmBtn.style.display = (gameState.stats.totalYen >= 1000000000) ? "inline-block" : "none";
+  
+  document.querySelector('#gacha-tech button').disabled = y < getGachaCost('technique');
+  document.querySelector('#gacha-tech button').innerText = `Spin Technique (¥${formatNumber(getGachaCost('technique'))})`;
+  document.querySelector('#gacha-weap button').disabled = y < getGachaCost('weapon');
+  document.querySelector('#gacha-weap button').innerText = `Spin Weapon (¥${formatNumber(getGachaCost('weapon'))})`;
+  document.querySelector('#gacha-trait button').disabled = y < getGachaCost('trait');
+  document.querySelector('#gacha-trait button').innerText = `Spin Trait (¥${formatNumber(getGachaCost('trait'))})`;
+  document.querySelector('#gacha-clan button').disabled = y < getGachaCost('clan');
+  document.querySelector('#gacha-clan button').innerText = `Spin Clan (¥${formatNumber(getGachaCost('clan'))})`;
+  
+  let ceCost = Math.max(10, Math.floor(gameState.cursedEnergy * 0.1));
+  if (DOM.rctBtn) {
+    DOM.rctBtn.innerText = `Reverse Cursed Technique (-${formatNumber(ceCost)} CE, Heal 50%)`;
+    DOM.rctBtn.disabled = gameState.cursedEnergy < ceCost || gameState.playerHp >= gameState.playerMaxHp;
+  }
+
+  let invHtml = '';
+  // Dictionary to label categories
+  const catNames = { 'technique': 'Techniques', 'weapon': 'Weapons', 'trait': 'Traits', 'clan': 'Bloodlines' };
+  
+  ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
+     if (gameState.inventory[t] && gameState.inventory[t].length > 0) {
+       invHtml += `<div class="inv-category">${catNames[t]}</div>`;
+       gameState.inventory[t].forEach(item => {
+          let isEquipped = gameState[t] && gameState[t].name === item.name;
+          invHtml += `<button onclick="equipItem('${t}', '${item.name.replace(/'/g, "\\'")}')" style="font-size:11px; padding:4px 6px; margin:2px; background:${isEquipped ? 'var(--accent)' : '#2a2a35'}; border: 1px solid ${isEquipped ? '#fff' : '#444'};">
+            <span class="${rarities[item.rarity].class}">${item.name}</span>
+          </button>`;
+       });
+     }
+  });
+  if (invHtml === '') invHtml = '<span style="font-size:11px; color:#666;">Inventory is empty. Spin Gacha!</span>';
+  let invList = document.getElementById('inventory-list');
+  if (invList) invList.innerHTML = invHtml;
+}
+
+// ===== TSS QUESTLINE =====
+function openTSSQuest() {
+  if (gameState.tssUnlocked) return;
+  DOM.tssQuestOverlay.style.display = 'flex';
+  
+  let hasSecret = false;
+  ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
+     if (gameState.inventory[t]) {
+       gameState.inventory[t].forEach(item => { if (item.rarity === 'Secret') hasSecret = true; });
+     }
+  });
+
+  let cullingCount = gameState.stats.cullingDefeated || 0;
+  let raidCount = gameState.stats.raidsDefeated || 0;
+  let bossCount = gameState.stats.bossesDefeated || 0;
+
+  DOM.reqSecret.innerText = (hasSecret ? "1" : "0") + " / 1";
+  DOM.reqSecret.style.color = hasSecret ? "#00ff00" : "#ff4444";
+  
+  DOM.reqCulling.innerText = Math.min(50, cullingCount) + " / 50";
+  DOM.reqCulling.style.color = cullingCount >= 50 ? "#00ff00" : "#ff4444";
+  
+  DOM.reqRaid.innerText = Math.min(25, raidCount) + " / 25";
+  DOM.reqRaid.style.color = raidCount >= 25 ? "#00ff00" : "#ff4444";
+  
+  DOM.reqBoss.innerText = Math.min(250, bossCount) + " / 250";
+  DOM.reqBoss.style.color = bossCount >= 250 ? "#00ff00" : "#ff4444";
+  
+  if (hasSecret && cullingCount >= 50 && raidCount >= 25 && bossCount >= 250) {
+      DOM.awakenBtn.disabled = false;
+      DOM.awakenBtn.style.background = "#ff9999";
+      DOM.awakenBtn.style.color = "#000";
+      DOM.awakenBtn.style.cursor = "pointer";
+      DOM.awakenBtn.innerText = "AWAKEN";
+  } else {
+      DOM.awakenBtn.disabled = true;
+      DOM.awakenBtn.style.background = "#220000";
+      DOM.awakenBtn.style.color = "#888";
+      DOM.awakenBtn.style.cursor = "not-allowed";
+      DOM.awakenBtn.innerText = "REQUIREMENTS NOT MET";
+  }
+}
+
+function triggerTSSAwakening() {
+  gameState.tssUnlocked = true;
+  DOM.tssQuestOverlay.style.display = 'none';
+  
+  let modTech = techniques.find(t => t.rarity === "The Strongest Sorcerer");
+  if (modTech) {
+     if (!gameState.inventory.technique) gameState.inventory.technique = [];
+     if (!gameState.inventory.technique.find(t => t.name === modTech.name)) {
+        gameState.inventory.technique.push(JSON.parse(JSON.stringify(modTech)));
+     }
+  }
+  
+  updateLog("!!! YOU HAVE AWAKENED THE STRONGEST SORCERER !!!", "sys");
+  
+  let flash = document.createElement("div");
+  flash.style.position = "fixed"; flash.style.top = "0"; flash.style.left = "0";
+  flash.style.width = "100vw"; flash.style.height = "100vh";
+  flash.style.background = "white"; flash.style.zIndex = "10000";
+  flash.style.transition = "opacity 2.5s ease-out";
+  flash.style.pointerEvents = "none";
+  document.body.appendChild(flash);
+  setTimeout(() => { flash.style.opacity = "0"; }, 100);
+  setTimeout(() => { flash.remove(); }, 2600);
+  
+  saveGame(); updateUI(); updateInventoryUI();
+}
+
+// ===== SAVE / LOAD =====
+function saveGame() {
+  gameState.lastSaveTime = Date.now();
+  try { localStorage.setItem('jjkIdleHpUpdate', JSON.stringify(gameState)); } catch(e) {}
+}
+
+function loadGame() {
+  try {
+    let saved = localStorage.getItem('jjkIdleHpUpdate');
+    if (!saved) return;
+    if (saved) {
+      let p = JSON.parse(saved);
+      gameState.yen = p.yen || 0; gameState.cursedEnergy = p.cursedEnergy || 0;
+      gameState.monarchStacks = p.monarchStacks || 0; gameState.bossLevel = p.bossLevel || 0;
+      gameState.bodyTrainingLevel = p.bodyTrainingLevel || 0;
+      gameState.grade = p.grade || 4;
+      gameState.sorcererType = p.sorcererType || null; 
+      gameState.technique = p.technique || null; gameState.weapon = p.weapon || null;
+      gameState.trait = p.trait || null; gameState.clan = p.clan || null;
+      
+      gameState.inventory = p.inventory || { technique: [], weapon: [], trait: [], clan: [] };
+      gameState.stats = p.stats || { totalYen: p.yen || 0, bossesDefeated: p.bossLevel || 0, raidsDefeated: 0, cullingDefeated: 0, timesPrestaged: 0, clicks: 0, blackFlashes: 0 };
+      gameState.tssUnlocked = p.tssUnlocked || false;
+      
+      gameState.sukunaFingers = p.sukunaFingers || 0;
+      gameState.cullingPoints = p.cullingPoints || 0;
+      gameState.equippedSkills = p.equippedSkills || [ {type:'t',id:1}, {type:'t',id:2}, null, null ];
+      
+      // Structural Backward Compatibility Fix for newly added Phase 8 Skills
+      if (gameState.inventory.technique) {
+        for (let t of gameState.inventory.technique) {
+          let base = techniques.find(x => x.name === t.name);
+          if (base) {
+             t.skill1 = base.skill1; t.skill2 = base.skill2; t.skill3 = base.skill3; 
+             t.skill4 = base.skill4; t.skill5 = base.skill5; t.skill6 = base.skill6;
+             t.dmgBuff = base.dmgBuff;
+             t.rarity = base.rarity; t.chance = base.chance;
+             if (gameState.technique && gameState.technique.name === t.name) {
+                gameState.technique.rarity = base.rarity;
+                gameState.technique.chance = base.chance;
+             }
+          }
+        }
+      }
+      if (gameState.inventory.weapon) {
+        for (let w of gameState.inventory.weapon) {
+          let baseW = weapons.find(x => x.name === w.name);
+          if (baseW) { w.wSkill = baseW.wSkill; w.dmgBonus = baseW.dmgBonus; }
+        }
+      }
+
+      if (gameState.inventory.trait) {
+        for (let t of gameState.inventory.trait) {
+          let base = traits.find(x => x.name === t.name);
+          if (base) { t.dmgBuff = base.dmgBuff; t.hpBuff = base.hpBuff; t.desc = base.desc; }
+        }
+      }
+      if (gameState.inventory.clan) {
+        for (let c of gameState.inventory.clan) {
+          let base = clansArray.find(x => x.name === c.name);
+          if (base) { c.dmgBuff = base.dmgBuff; c.hpBuff = base.hpBuff; }
+        }
+      }
+      
+      if (gameState.bmCeBuff === undefined) gameState.bmCeBuff = p.bmCeBuff || 0;
+      if (gameState.bmHpBuff === undefined) gameState.bmHpBuff = p.bmHpBuff || 0;
+      if (gameState.bmAutoClicker === undefined) gameState.bmAutoClicker = p.bmAutoClicker || false;
+
+      if (gameState.technique) {
+         let base = techniques.find(x => x.name === gameState.technique.name);
+         if (base) {
+            gameState.technique.skill1 = base.skill1; gameState.technique.skill2 = base.skill2; 
+            gameState.technique.skill3 = base.skill3; gameState.technique.skill4 = base.skill4; 
+            gameState.technique.skill5 = base.skill5; gameState.technique.skill6 = base.skill6;
+            gameState.technique.dmgBuff = base.dmgBuff;
+         }
+      }
+      if (gameState.weapon) {
+         let baseW = weapons.find(x => x.name === gameState.weapon.name);
+         if (baseW) {
+             gameState.weapon.wSkill = baseW.wSkill;
+             gameState.weapon.dmgBonus = baseW.dmgBonus;
+         }
+      }
+      if (gameState.trait) {
+         let baseT = traits.find(x => x.name === gameState.trait.name);
+         if (baseT) { gameState.trait.dmgBuff = baseT.dmgBuff; gameState.trait.hpBuff = baseT.hpBuff; gameState.trait.desc = baseT.desc; }
+      }
+      if (gameState.clan) {
+         let baseC = clansArray.find(x => x.name === gameState.clan.name);
+         if (baseC) { gameState.clan.dmgBuff = baseC.dmgBuff; gameState.clan.hpBuff = baseC.hpBuff; }
+      }
+      
+      if (p.lastSaveTime) {
+        let secondsOffline = Math.floor((Date.now() - p.lastSaveTime) / 1000);
+        if (secondsOffline >= 60) gameState.pendingOfflineSeconds = secondsOffline;
+      }
+
+      if (p.pity) gameState.pity = p.pity; // Load pity trackers perfectly
+      if(p.allies) for(let k in p.allies) if(gameState.allies[k] && p.allies[k]) gameState.allies[k].owned = p.allies[k].owned || 0;
+
+      // Phase 3: Memoria persistence
+      gameState.memoriaShards = p.memoriaShards || 0;
+      gameState.memoria = p.memoria || [];
+      gameState.rebirths = p.rebirths || 0;
+      gameState.comboDriveStacks = p.comboDriveStacks || 0;
+      gameState.flowingForceClicks = p.flowingForceClicks || 0;
+      gameState.gpShop = p.gpShop || {};
+    }
+  } catch(e) {}
+}
+
+window.onload = initGame;
+</script>
+</body>
+</html>
