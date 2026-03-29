@@ -98,6 +98,67 @@ button:disabled { background: #444; color: #888; cursor: not-allowed; text-shado
 .text-tss { background: linear-gradient(90deg, #ff9999, #ffffff, #ff9999); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 12px rgba(255,153,153,0.8); font-weight: bold; background-size: 200% auto; animation: tssPulse 2s linear infinite; font-size: 1.1em; }
 @keyframes tssPulse { to { background-position: 200% center; } }
 
+/* Memoria tier names — two-tone animated (matches rarities-style motion) */
+.text-memoria-vanguard {
+  background: linear-gradient(90deg, #0a0a0a 0%, #312e81 22%, #6366f1 50%, #1e1b4b 78%, #0a0a0a 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 220% auto;
+  will-change: background-position;
+  animation: memoriaTwoTone 9s linear infinite;
+}
+.text-memoria-godly {
+  background: linear-gradient(90deg, #fef9c3 0%, #fde047 25%, #ffffff 50%, #facc15 75%, #fffbeb 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 200% auto;
+  will-change: background-position;
+  animation: memoriaTwoTone 8s linear infinite;
+}
+.text-memoria-cosmic {
+  background: linear-gradient(90deg, #fce7f3 0%, #e879f9 30%, #ffffff 50%, #d946ef 70%, #fdf4ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 200% auto;
+  will-change: background-position;
+  animation: memoriaTwoTone 8.5s linear infinite;
+}
+@keyframes memoriaTwoTone {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Mythic techniques only — two-tone animated (rarity stays Mythic in data) */
+.text-mythic-projection {
+  background: linear-gradient(90deg, #7dd3fc 0%, #ffffff 20%, #38bdf8 45%, #ffffff 55%, #bae6fd 80%, #e0f2fe 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 200% auto;
+  will-change: background-position;
+  animation: mythicTechShift 10s linear infinite;
+}
+.text-mythic-ice {
+  background: linear-gradient(90deg, #e0f2fe 0%, #7dd3fc 25%, #ffffff 50%, #38bdf8 75%, #f0f9ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 200% auto;
+  will-change: background-position;
+  animation: mythicTechShift 10.5s linear infinite;
+}
+.text-mythic-ten-shadows {
+  background: linear-gradient(90deg, #0f0f0f 0%, #4c1d95 30%, #1e1b4b 50%, #7c3aed 70%, #020617 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 220% auto;
+  will-change: background-position;
+  animation: mythicTechShift 11s linear infinite;
+}
+.text-mythic-comedian {
+  background: linear-gradient(90deg, #fffbeb 0%, #fde047 22%, #ffffff 45%, #facc15 68%, #fef3c7 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: bold; background-size: 200% auto;
+  will-change: background-position;
+  animation: mythicTechShift 9s linear infinite;
+}
+@keyframes mythicTechShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
 .gacha-tabs { display: flex; margin-bottom: 10px; border-bottom: 2px solid #333; }
 .gacha-tab { flex: 1; background: transparent; color: #888; border-radius: 6px 6px 0 0; margin: 0; padding: 10px; font-size: 13px; }
 .gacha-tab.active { color: #fff; border-bottom: 2px solid var(--accent); background: rgba(255,255,255,0.05); }
@@ -148,9 +209,31 @@ button:disabled { background: #444; color: #888; cursor: not-allowed; text-shado
 .memoria-card { background: #111; border: 2px solid var(--accent); padding: 15px; border-radius: 8px; margin: 10px; width: 600px; text-align: left; }
 .memoria-btn { width: 150px; padding: 10px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; margin: 0 10px; transition: 0.2s; }
 .memoria-btn:hover { transform: scale(1.05); }
-.btn-vanguard { background: linear-gradient(135deg, #0055ff, #00aaff); color: white; box-shadow: 0 0 10px #00aaff;}
-.btn-godly { background: linear-gradient(135deg, #ffaa00, #ffdd00); color: black; box-shadow: 0 0 10px #ffaa00;}
-.btn-cosmic { background: linear-gradient(135deg, #aa00ff, #ff00ff); color: white; box-shadow: 0 0 10px #ff00ff;}
+.btn-vanguard {
+  color: #e0e7ff;
+  background: linear-gradient(270deg, #0a0a0a, #312e81, #4f46e5, #1e1b4b, #312e81, #0a0a0a);
+  background-size: 300% 300%;
+  animation: memoriaBtnPulse 14s linear infinite;
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.55);
+}
+.btn-godly {
+  color: #1c1917;
+  background: linear-gradient(270deg, #fffbeb, #fde047, #ffffff, #facc15, #fde047, #fffbeb);
+  background-size: 300% 300%;
+  animation: memoriaBtnPulse 12s linear infinite;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.5);
+}
+.btn-cosmic {
+  color: #fdf4ff;
+  background: linear-gradient(270deg, #fdf4ff, #e879f9, #ffffff, #d946ef, #e879f9, #4a044e);
+  background-size: 300% 300%;
+  animation: memoriaBtnPulse 13s linear infinite;
+  box-shadow: 0 0 14px rgba(217, 70, 239, 0.55);
+}
+@keyframes memoriaBtnPulse {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
 
 #gp-shop-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; box-sizing: border-box; padding-bottom: 150px;
@@ -500,73 +583,95 @@ const rarities = {
   "Secret": { class: "text-secret" }, "The Strongest Sorcerer": { class: "text-tss" }
 };
 
+/** Boss progression cap; mitigation uses this level (see getEnemyMitigation). */
+const MAX_BOSS_LEVEL = 120;
+
+/** Mythic techniques keep rarity "Mythic" but use custom two-tone animated display classes. */
+const mythicTechniqueStyles = {
+  "Projection Sorcery": "text-mythic-projection",
+  "Ice Formation": "text-mythic-ice",
+  "Ten Shadows": "text-mythic-ten-shadows",
+  "Comedian": "text-mythic-comedian"
+};
+
+function getTechniqueRarityClass(tech) {
+  if (!tech) return "text-common";
+  if (tech.rarity === "Mythic" && mythicTechniqueStyles[tech.name]) return mythicTechniqueStyles[tech.name];
+  const r = rarities[tech.rarity];
+  return r ? r.class : "text-common";
+}
+
+function clampBossLevel() {
+  if (gameState.bossLevel > MAX_BOSS_LEVEL) gameState.bossLevel = MAX_BOSS_LEVEL;
+}
+
 const techniques = [
-  { name: "Cursed Energy Control", rarity: "Common", dmgBuff: 0.1, chance: 0.45, skill1: {n:"Basic Strike", cd: 5, mult:2, log:"You punch the curse!"}, skill2: {n:"Cursed Sweep", cd: 20, mult:5, log:"You sweep the area!"}, skill3: {n:"Focused Blow", cd: 15, mult: 7, log:"A heavy strike connects!"}, skill4: {n:"Energy Wave", cd: 25, mult: 10, log:"A wave of energy blasts!"}, skill5: {n:"Overclock", cd: 40, mult: 15, log:"CE bursts from within!"}, skill6: {n:"Maximum Output", cd: 60, mult: 25, log:"Maximum Output obliterates!"} },
-  { name: "Tool Manipulation", rarity: "Common", dmgBuff: 0.15, chance: 0.20, skill1: {n:"Weapon Toss", cd: 6, mult:3, log:"A weapon is thrown!"}, skill2: {n:"Flurry", cd: 18, mult:6, log:"Weapon flurry!"}, skill3: {n:"Hidden Blade", cd: 15, mult: 8, log:"A trick weapon extends!"}, skill4: {n:"Arsenal Barrage", cd: 25, mult: 12, log:"Dozens of tools fall!"}, skill5: {n:"Cursed Thread", cd: 35, mult: 18, log:"Tools dance on strings!"}, skill6: {n:"Endless Armory", cd: 60, mult: 30, log:"The armory empties on them!"} },
-  { name: "Disaster Plants", rarity: "Rare", dmgBuff: 0.25, chance: 0.15, skill1: {n:"Wooden Roots", cd: 7, mult:10, log:"Roots pierce the enemy!"}, skill2: {n:"Cursed Bud", cd: 35, mult:25, log:"Cursed buds drain them!"}, skill3: {n:"Flower Field", cd: 20, mult: 20, log:"Sapping flowers bloom!"}, skill4: {n:"Cursed Seed", cd: 15, mult: 30, log:"A parasitical seed takes root!"}, skill5: {n:"Nature's Wrath", cd: 45, mult: 55, log:"Nature reclaims its land!"}, skill6: {n:"Forest Expansion", cd: 80, mult: 120, log:"Complete forest takeover!"} },
-  { name: "Cursed Speech", rarity: "Rare", dmgBuff: 0.35, chance: 0.12, skill1: {n:"SLEEP!", cd: 6, mult: 6, log:"They abruptly fall drowsy!"}, skill2: {n:"BLAST AWAY!", cd: 15, mult: 15, log:"They are violently repelled!"}, skill3: {n:"PLUMMET!", cd: 25, mult: 25, log:"Gravity crushes them down!"}, skill4: {n:"STOP!", cd: 40, mult: 40, log:"They completely freeze!"}, skill5: {n:"CRUSH!", cd: 30, mult: 55, log:"They are aggressively flattened!"}, skill6: {n:"DIE!", cd: 80, mult: 100, log:"A lethal command, tearing your throat!"} },
-  { name: "Ratio Technique", rarity: "Rare", dmgBuff: 0.4, chance: 0.10, skill1: {n:"7:3 Strike", cd: 5, mult:8, log:"Critical point struck!"}, skill2: {n:"Collapse", cd: 25, mult:18, log:"Aimed at the foundation!"}, skill3: {n:"Calculation", cd: 10, mult: 12, log:"Weakness calculated!"}, skill4: {n:"Overtime", cd: 45, mult: 35, log:"Overtime unlocks full power!"}, skill5: {n:"Severing Blow", cd: 15, mult: 20, log:"Severed cleanly!"}, skill6: {n:"Resonance Strike", cd: 60, mult: 60, log:"Complete ratio destruction!"} },
-  { name: "Mythical Beast Amber", rarity: "Epic", dmgBuff: 5.0, chance: 0.05, skill1: {n:"Lightning Discharge", cd: 5, mult:6, log:"Lightning blasts the enemy!"}, skill2: {n:"Phantom Beast Ambush", cd: 40, mult:20, log:"Mythical Beast obliterates!"}, skill3: {n:"Electromagnetic Pulse", cd: 15, mult: 15, log:"EMP disrupts their flow!"}, skill4: {n:"Mach 3 Dash", cd: 25, mult: 30, log:"Sound barrier shattered!"}, skill5: {n:"Peal of Thunder", cd: 35, mult: 45, log:"Thunder deafens!"}, skill6: {n:"Incarnation: Absolute", cd: 80, mult: 100, log:"Amber absorbs completely!"} },
-  { name: "Blood Manipulation", rarity: "Epic", dmgBuff: 6.5, chance: 0.035, skill1: {n:"Piercing Blood", cd: 8, mult:5, log:"Piercing Blood shreds the enemy!"}, skill2: {n:"Supernova", cd: 30, mult:15, log:"Supernova detonates!"}, skill3: {n:"Slicing Exorcism", cd: 12, mult: 10, log:"A blood blade swings!"}, skill4: {n:"Flowing Red Scale", cd: 40, mult: 25, log:"Body heat vaporizes blood!"}, skill5: {n:"Convergence", cd: 20, mult: 20, log:"Blood violently condenses!"}, skill6: {n:"Maximum: Wing King", cd: 70, mult: 50, log:"Poisonous blood wings emerge!"} },
-  { name: "Construction", rarity: "Epic", dmgBuff: 8.0, chance: 0.02, skill1: {n:"Liquid Metal Strike", cd: 6, mult: 12, log:"Liquid metal pierces them!"}, skill2: {n:"Insect Armor", cd: 25, mult: 20, log:"You clad yourself in resilient armor!"}, skill3: {n:"Metallic Wing Sweep", cd: 15, mult: 25, log:"Metal wings slash the area!"}, skill4: {n:"True Sphere Formation", cd: 45, mult: 45, log:"Infinite pressure begins building!"}, skill5: {n:"Domain: Triple Affliction", cd: 80, mult: 80, log:"A fleshy, chaotic domain surrounds them!"}, skill6: {n:"True Sphere: Perfect Execution", cd: 110, mult: 150, log:"The Perfect Sphere ignores all reality and crushes!"} },
-  { name: "Idle Death Gamble", rarity: "Legendary", dmgBuff: 12.0, chance: 0.007, skill1: {n:"Train Doors", cd: 10, mult:10, log:"Train sliding doors slam them!"}, skill2: {n:"Domain: Jackpot", cd: 60, mult:50, log:"JACKPOT! Infinite Cursed Energy!"}, skill3: {n:"Probability Shift", cd: 15, mult: 25, log:"The odds shift favorably!"}, skill4: {n:"Vibration Sphere", cd: 30, mult: 40, log:"Vibration crushes them!"}, skill5: {n:"Fever Pitch", cd: 40, mult: 80, log:"The fever rises to maximum!"}, skill6: {n:"Infinite Regen Crush", cd: 90, mult: 200, log:"Immortal raw power strikes!"} },
-  { name: "Copy (Yuta)", rarity: "Legendary", dmgBuff: 15.0, chance: 0.005, skill1: {n:"Thin Ice Breaker", cd: 8, mult:15, log:"Space breaks like thin ice!"}, skill2: {n:"Domain: Mutual Love", cd: 60, mult:60, log:"Authentic Mutual Love copies their doom!"}, skill3: {n:"Rika Manifestation", cd: 25, mult: 35, log:"RIKA! Kill them!"}, skill4: {n:"Cursed Speech", cd: 20, mult: 40, log:"DON'T MOVE!"}, skill5: {n:"Jacob's Ladder", cd: 50, mult: 100, log:"Extreme light purifies!"}, skill6: {n:"Ultimate Love Beam", cd: 100, mult: 250, log:"Pure love vaporizes everything!"} },
-  { name: "Star Rage", rarity: "Legendary", dmgBuff: 18.0, chance: 0.002, skill1: {n:"Virtual Mass", cd: 10, mult:25, log:"Overwhelming mass strikes!"}, skill2: {n:"Black Hole", cd: 70, mult:100, log:"A Black Hole absorbs everything!"}, skill3: {n:"Garuda Whip", cd: 15, mult: 40, log:"Garuda lashes out!"}, skill4: {n:"Meteor Kick", cd: 25, mult: 60, log:"A kick with the weight of meteorites!"}, skill5: {n:"Planetary Crush", cd: 45, mult: 120, log:"Planetary mass compresses!"}, skill6: {n:"Supernova Implosion", cd: 110, mult: 300, log:"Everything collapses internally!"} },
-  { name: "Angel's Extinguishment", rarity: "Legendary", dmgBuff: 20.0, chance: 0.001, skill1: {n:"Trumpet Resound", cd: 8, mult: 15, log:"A trumpet of purification echoes!"}, skill2: {n:"Cherub's Shield", cd: 20, mult: 25, log:"White wings block incoming damage!"}, skill3: {n:"Holy Light Beam", cd: 15, mult: 35, log:"A blinding light sears their soul!"}, skill4: {n:"Technique Nullifier", cd: 40, mult: 50, log:"Their Innate Technique fractures!"}, skill5: {n:"Divine Flight", cd: 30, mult: 60, log:"You soar out of reach, dropping light!"}, skill6: {n:"Jacob's Ladder", cd: 90, mult: 180, log:"A pillar of absolute purification descends from heaven!"} },
-  { name: "Sky Manipulation", rarity: "Legendary", dmgBuff: 25.0, chance: 0.0008, skill1: {n:"Spatial Contortion", cd: 6, mult: 20, log:"The sky bends violently!"}, skill2: {n:"Flight Evasion", cd: 20, mult: 30, log:"You warp space to avoid an attack!"}, skill3: {n:"Thin Ice Breaker", cd: 12, mult: 40, log:"A spatial strike shatters like ice!"}, skill4: {n:"Reflective Sky Surface", cd: 35, mult: 55, log:"Their attack is warped back at them!"}, skill5: {n:"Atmospheric Crush", cd: 50, mult: 80, log:"The air pressure itself crushes them!"}, skill6: {n:"Maximum: Empty Sky", cd: 100, mult: 220, log:"The entire localized space violently rips apart!"} },
-  { name: "Projection Sorcery", rarity: "Mythic", dmgBuff: 40.0, chance: 0.0004, skill1: {n:"Accelerated Step", cd: 4, mult: 25, col:"#ffcc00", log:"A blurry dash!"}, skill2: {n:"24 FPS Trajectory", cd: 15, mult: 45, col:"#ccccff", log:"The frame rules accelerate!"}, skill3: {n:"Aura Freeze", cd: 30, mult: 65, col:"#ccd9ff", log:"Frozen inside an anomalous frame!"}, skill4: {n:"Mach 1 Assault", cd: 20, mult: 80, col:"#ffff99", log:"A supersonic barrage!"}, skill5: {n:"Domain: Time Cell Moon Palace", cd: 75, mult: 150, col:"#ff80df", log:"The cellular structure itself must follow 24 frames!"}, skill6: {n:"Maximum Speed: Supreme Frame", cd: 50, mult: 280, col:"#ffffff", log:"You shatter the sonic barrier directly into them!"} },
-  { name: "Ice Formation", rarity: "Mythic", dmgBuff: 45.0, chance: 0.0003, skill1: {n:"Frost Surge", cd: 6, mult: 20, col:"#99ffff", log:"A bitter frost bites them!"}, skill2: {n:"Ice Column", cd: 12, mult: 40, col:"#66ccff", log:"A massive column of ice erupts!"}, skill3: {n:"Frost Calm", cd: 35, mult: 80, col:"#b3e6ff", log:"A chilling mist freezes them to the bone!"}, skill4: {n:"Glacial Expanse", cd: 25, mult: 100, col:"#e6f7ff", log:"The entire floor freezes instantly!"}, skill5: {n:"Ice Fall", cd: 50, mult: 160, col:"#ccccff", log:"Gigantic icicles rain indiscriminately!"}, skill6: {n:"Maximum: Absolute Zero", cd: 110, mult: 350, col:"#ffffff", log:"All thermal motion ceases completely!"} },
-  { name: "Ten Shadows", rarity: "Mythic", dmgBuff: 50.0, chance: 0.0002, skill1: {n:"Divine Dogs: Totality", cd: 8, mult: 30, col:"#1a1a1a", log:"The fused hound brutally tears flesh!"}, skill2: {n:"Nue's Lightning", cd: 15, mult: 45, col:"#ffcc00", log:"A cursed lightning strike from above!"}, skill3: {n:"Max Elephant Drop", cd: 25, mult: 70, col:"#ccccff", log:"A massive elephant crushes them with water!"}, skill4: {n:"Domain: Chimera Shadow Garden", cd: 70, mult: 120, col:"#000000", log:"A sea of shadows continuously swarms!"}, skill5: {n:"Piercing Ox Charge", cd: 40, mult: 180, col:"#ff4d4d", log:"An unstoppable accelerating charge connects!"}, skill6: {n:"Sacred Treasure: Mahoraga", cd: 140, mult: 600, col:"#e6e6fa", log:"WITH THIS TREASURE I SUMMON! Mahoraga executes them!"} },
-  { name: "Comedian", rarity: "Mythic", dmgBuff: 55.0, chance: 0.00015, skill1: {n:"Wouldn't it be funny...", cd: 2, mult:30, col:"#ffcc00", log:"Reality warps humorously!"}, skill2: {n:"Truck Kun", cd: 30, mult:100, col:"#cccccc", log:"A truck appears out of nowhere!"}, skill3: {n:"Slapstick Hammer", cd: 10, mult: 50, col:"#ff9933", log:"A cartoon hammer smashes!"}, skill4: {n:"Piano Drop", cd: 20, mult: 80, col:"#eeeeee", log:"A grand piano crushes them flat!"}, skill5: {n:"Gag Reel", cd: 40, mult: 180, col:"#ff66b2", log:"Reality becomes a comedy skit!"}, skill6: {n:"Fourth Wall Break", cd: 90, mult: 550, col:"#33ff33", log:"The code itself attacks them!"} },
-  { name: "Limitless (Gojo)", rarity: "Secret", dmgBuff: 250.0, chance: 0.00008, skill1: {n:"Cursed Reversal: Red", cd: 5, mult: 40, col:"#ff1a1a", log:"Red blasts them away!"}, skill2: {n:"Domain: Unlimited Void", cd: 30, mult: 150, col:"#66ccff", log:"Unlimited Void paralyzes them!"}, skill3: {n:"Cursed Technique: Blue", cd: 8, mult: 80, col:"#0073e6", log:"Blue crushes their atoms!"}, skill4: {n:"Infinity Burst", cd: 15, mult: 100, col:"#cc99ff", log:"Infinity expands violently!"}, skill5: {n:"Hollow Purple", cd: 45, mult: 450, col:"#9900ff", log:"Imaginary mass erases reality!"}, skill6: {n:"200% Hollow Purple", cd: 100, mult: 1250, col:"#ff66ff", log:"An unrestricted nuke of Purple!"} },
+  { name: "Cursed Energy Control", rarity: "Common", dmgBuff: 0.1, chance: 0.13, skill1: {n:"Basic Strike", cd: 5, mult:2, log:"You punch the curse!"}, skill2: {n:"Cursed Sweep", cd: 20, mult:5, log:"You sweep the area!"}, skill3: {n:"Focused Blow", cd: 15, mult: 7, log:"A heavy strike connects!"}, skill4: {n:"Energy Wave", cd: 25, mult: 10, log:"A wave of energy blasts!"}, skill5: {n:"Overclock", cd: 40, mult: 15, log:"CE bursts from within!"}, skill6: {n:"Maximum Output", cd: 60, mult: 25, log:"Maximum Output obliterates!"} },
+  { name: "Tool Manipulation", rarity: "Common", dmgBuff: 0.15, chance: 0.13, skill1: {n:"Weapon Toss", cd: 6, mult:3, log:"A weapon is thrown!"}, skill2: {n:"Flurry", cd: 18, mult:6, log:"Weapon flurry!"}, skill3: {n:"Hidden Blade", cd: 15, mult: 8, log:"A trick weapon extends!"}, skill4: {n:"Arsenal Barrage", cd: 25, mult: 12, log:"Dozens of tools fall!"}, skill5: {n:"Cursed Thread", cd: 35, mult: 18, log:"Tools dance on strings!"}, skill6: {n:"Endless Armory", cd: 60, mult: 30, log:"The armory empties on them!"} },
+  { name: "Disaster Plants", rarity: "Rare", dmgBuff: 0.25, chance: 0.09, skill1: {n:"Wooden Roots", cd: 7, mult:10, log:"Roots pierce the enemy!"}, skill2: {n:"Cursed Bud", cd: 35, mult:25, log:"Cursed buds drain them!"}, skill3: {n:"Flower Field", cd: 20, mult: 20, log:"Sapping flowers bloom!"}, skill4: {n:"Cursed Seed", cd: 15, mult: 30, log:"A parasitical seed takes root!"}, skill5: {n:"Nature's Wrath", cd: 45, mult: 55, log:"Nature reclaims its land!"}, skill6: {n:"Forest Expansion", cd: 80, mult: 120, log:"Complete forest takeover!"} },
+  { name: "Cursed Speech", rarity: "Rare", dmgBuff: 0.35, chance: 0.09, skill1: {n:"SLEEP!", cd: 6, mult: 6, log:"They abruptly fall drowsy!"}, skill2: {n:"BLAST AWAY!", cd: 15, mult: 15, log:"They are violently repelled!"}, skill3: {n:"PLUMMET!", cd: 25, mult: 25, log:"Gravity crushes them down!"}, skill4: {n:"STOP!", cd: 40, mult: 40, log:"They completely freeze!"}, skill5: {n:"CRUSH!", cd: 30, mult: 55, log:"They are aggressively flattened!"}, skill6: {n:"DIE!", cd: 80, mult: 100, log:"A lethal command, tearing your throat!"} },
+  { name: "Ratio Technique", rarity: "Rare", dmgBuff: 0.4, chance: 0.09, skill1: {n:"7:3 Strike", cd: 5, mult:8, log:"Critical point struck!"}, skill2: {n:"Collapse", cd: 25, mult:18, log:"Aimed at the foundation!"}, skill3: {n:"Calculation", cd: 10, mult: 12, log:"Weakness calculated!"}, skill4: {n:"Overtime", cd: 45, mult: 35, log:"Overtime unlocks full power!"}, skill5: {n:"Severing Blow", cd: 15, mult: 20, log:"Severed cleanly!"}, skill6: {n:"Resonance Strike", cd: 60, mult: 60, log:"Complete ratio destruction!"} },
+  { name: "Mythical Beast Amber", rarity: "Epic", dmgBuff: 5.0, chance: 0.083333, skill1: {n:"Lightning Discharge", cd: 5, mult:6, log:"Lightning blasts the enemy!"}, skill2: {n:"Phantom Beast Ambush", cd: 40, mult:20, log:"Mythical Beast obliterates!"}, skill3: {n:"Electromagnetic Pulse", cd: 15, mult: 15, log:"EMP disrupts their flow!"}, skill4: {n:"Mach 3 Dash", cd: 25, mult: 30, log:"Sound barrier shattered!"}, skill5: {n:"Peal of Thunder", cd: 35, mult: 45, log:"Thunder deafens!"}, skill6: {n:"Incarnation: Absolute", cd: 80, mult: 100, log:"Amber absorbs completely!"} },
+  { name: "Blood Manipulation", rarity: "Epic", dmgBuff: 6.5, chance: 0.083333, skill1: {n:"Piercing Blood", cd: 8, mult:5, log:"Piercing Blood shreds the enemy!"}, skill2: {n:"Supernova", cd: 30, mult:15, log:"Supernova detonates!"}, skill3: {n:"Slicing Exorcism", cd: 12, mult: 10, log:"A blood blade swings!"}, skill4: {n:"Flowing Red Scale", cd: 40, mult: 25, log:"Body heat vaporizes blood!"}, skill5: {n:"Convergence", cd: 20, mult: 20, log:"Blood violently condenses!"}, skill6: {n:"Maximum: Wing King", cd: 70, mult: 50, log:"Poisonous blood wings emerge!"} },
+  { name: "Construction", rarity: "Epic", dmgBuff: 8.0, chance: 0.083334, skill1: {n:"Liquid Metal Strike", cd: 6, mult: 12, log:"Liquid metal pierces them!"}, skill2: {n:"Insect Armor", cd: 25, mult: 20, log:"You clad yourself in resilient armor!"}, skill3: {n:"Metallic Wing Sweep", cd: 15, mult: 25, log:"Metal wings slash the area!"}, skill4: {n:"True Sphere Formation", cd: 45, mult: 45, log:"Infinite pressure begins building!"}, skill5: {n:"Domain: Triple Affliction", cd: 80, mult: 80, log:"A fleshy, chaotic domain surrounds them!"}, skill6: {n:"True Sphere: Perfect Execution", cd: 110, mult: 150, log:"The Perfect Sphere ignores all reality and crushes!"} },
+  { name: "Idle Death Gamble", rarity: "Legendary", dmgBuff: 12.0, chance: 0.02, skill1: {n:"Train Doors", cd: 10, mult:10, log:"Train sliding doors slam them!"}, skill2: {n:"Domain: Jackpot", cd: 60, mult:50, log:"JACKPOT! Infinite Cursed Energy!"}, skill3: {n:"Probability Shift", cd: 15, mult: 25, log:"The odds shift favorably!"}, skill4: {n:"Vibration Sphere", cd: 30, mult: 40, log:"Vibration crushes them!"}, skill5: {n:"Fever Pitch", cd: 40, mult: 80, log:"The fever rises to maximum!"}, skill6: {n:"Infinite Regen Crush", cd: 90, mult: 200, log:"Immortal raw power strikes!"} },
+  { name: "Copy (Yuta)", rarity: "Legendary", dmgBuff: 15.0, chance: 0.025, skill1: {n:"Thin Ice Breaker", cd: 8, mult:15, log:"Space breaks like thin ice!"}, skill2: {n:"Domain: Mutual Love", cd: 60, mult:60, log:"Authentic Mutual Love copies their doom!"}, skill3: {n:"Rika Manifestation", cd: 25, mult: 35, log:"RIKA! Kill them!"}, skill4: {n:"Cursed Speech", cd: 20, mult: 40, log:"DON'T MOVE!"}, skill5: {n:"Jacob's Ladder", cd: 50, mult: 100, log:"Extreme light purifies!"}, skill6: {n:"Ultimate Love Beam", cd: 100, mult: 250, log:"Pure love vaporizes everything!"} },
+  { name: "Star Rage", rarity: "Legendary", dmgBuff: 18.0, chance: 0.03, skill1: {n:"Virtual Mass", cd: 10, mult:25, log:"Overwhelming mass strikes!"}, skill2: {n:"Black Hole", cd: 70, mult:100, log:"A Black Hole absorbs everything!"}, skill3: {n:"Garuda Whip", cd: 15, mult: 40, log:"Garuda lashes out!"}, skill4: {n:"Meteor Kick", cd: 25, mult: 60, log:"A kick with the weight of meteorites!"}, skill5: {n:"Planetary Crush", cd: 45, mult: 120, log:"Planetary mass compresses!"}, skill6: {n:"Supernova Implosion", cd: 110, mult: 300, log:"Everything collapses internally!"} },
+  { name: "Angel's Extinguishment", rarity: "Legendary", dmgBuff: 20.0, chance: 0.04, skill1: {n:"Trumpet Resound", cd: 8, mult: 15, log:"A trumpet of purification echoes!"}, skill2: {n:"Cherub's Shield", cd: 20, mult: 25, log:"White wings block incoming damage!"}, skill3: {n:"Holy Light Beam", cd: 15, mult: 35, log:"A blinding light sears their soul!"}, skill4: {n:"Technique Nullifier", cd: 40, mult: 50, log:"Their Innate Technique fractures!"}, skill5: {n:"Divine Flight", cd: 30, mult: 60, log:"You soar out of reach, dropping light!"}, skill6: {n:"Jacob's Ladder", cd: 90, mult: 180, log:"A pillar of absolute purification descends from heaven!"} },
+  { name: "Sky Manipulation", rarity: "Legendary", dmgBuff: 25.0, chance: 0.05, skill1: {n:"Spatial Contortion", cd: 6, mult: 20, log:"The sky bends violently!"}, skill2: {n:"Flight Evasion", cd: 20, mult: 30, log:"You warp space to avoid an attack!"}, skill3: {n:"Thin Ice Breaker", cd: 12, mult: 40, log:"A spatial strike shatters like ice!"}, skill4: {n:"Reflective Sky Surface", cd: 35, mult: 55, log:"Their attack is warped back at them!"}, skill5: {n:"Atmospheric Crush", cd: 50, mult: 80, log:"The air pressure itself crushes them!"}, skill6: {n:"Maximum: Empty Sky", cd: 100, mult: 220, log:"The entire localized space violently rips apart!"} },
+  { name: "Projection Sorcery", rarity: "Mythic", dmgBuff: 40.0, chance: 0.01, skill1: {n:"Accelerated Step", cd: 4, mult: 25, col:"#7dd3fc", log:"A blurry dash!"}, skill2: {n:"24 FPS Trajectory", cd: 15, mult: 45, col:"#bae6fd", log:"The frame rules accelerate!"}, skill3: {n:"Aura Freeze", cd: 30, mult: 65, col:"#38bdf8", log:"Frozen inside an anomalous frame!"}, skill4: {n:"Mach 1 Assault", cd: 20, mult: 80, col:"#e0f2fe", log:"A supersonic barrage!"}, skill5: {n:"Domain: Time Cell Moon Palace", cd: 75, mult: 150, col:"#ffffff", log:"The cellular structure itself must follow 24 frames!"}, skill6: {n:"Maximum Speed: Supreme Frame", cd: 50, mult: 280, col:"#f0f9ff", log:"You shatter the sonic barrier directly into them!"} },
+  { name: "Ice Formation", rarity: "Mythic", dmgBuff: 45.0, chance: 0.0125, skill1: {n:"Frost Surge", cd: 6, mult: 20, col:"#e0f2fe", log:"A bitter frost bites them!"}, skill2: {n:"Ice Column", cd: 12, mult: 40, col:"#7dd3fc", log:"A massive column of ice erupts!"}, skill3: {n:"Frost Calm", cd: 35, mult: 80, col:"#ffffff", log:"A chilling mist freezes them to the bone!"}, skill4: {n:"Glacial Expanse", cd: 25, mult: 100, col:"#bae6fd", log:"The entire floor freezes instantly!"}, skill5: {n:"Ice Fall", cd: 50, mult: 160, col:"#38bdf8", log:"Gigantic icicles rain indiscriminately!"}, skill6: {n:"Maximum: Absolute Zero", cd: 110, mult: 350, col:"#f8fafc", log:"All thermal motion ceases completely!"} },
+  { name: "Ten Shadows", rarity: "Mythic", dmgBuff: 50.0, chance: 0.015, skill1: {n:"Divine Dogs: Totality", cd: 8, mult: 30, col:"#1e1b4b", log:"The fused hound brutally tears flesh!"}, skill2: {n:"Nue's Lightning", cd: 15, mult: 45, col:"#a78bfa", log:"A cursed lightning strike from above!"}, skill3: {n:"Max Elephant Drop", cd: 25, mult: 70, col:"#4c1d95", log:"A massive elephant crushes them with water!"}, skill4: {n:"Domain: Chimera Shadow Garden", cd: 70, mult: 120, col:"#0f172a", log:"A sea of shadows continuously swarms!"}, skill5: {n:"Piercing Ox Charge", cd: 40, mult: 180, col:"#7c3aed", log:"An unstoppable accelerating charge connects!"}, skill6: {n:"Sacred Treasure: Mahoraga", cd: 140, mult: 600, col:"#e9d5ff", log:"WITH THIS TREASURE I SUMMON! Mahoraga executes them!"} },
+  { name: "Comedian", rarity: "Mythic", dmgBuff: 55.0, chance: 0.0175, skill1: {n:"Wouldn't it be funny...", cd: 2, mult:30, col:"#fef08a", log:"Reality warps humorously!"}, skill2: {n:"Truck Kun", cd: 30, mult:100, col:"#ffffff", log:"A truck appears out of nowhere!"}, skill3: {n:"Slapstick Hammer", cd: 10, mult: 50, col:"#fde047", log:"A cartoon hammer smashes!"}, skill4: {n:"Piano Drop", cd: 20, mult: 80, col:"#fffbeb", log:"A grand piano crushes them flat!"}, skill5: {n:"Gag Reel", cd: 40, mult: 180, col:"#facc15", log:"Reality becomes a comedy skit!"}, skill6: {n:"Fourth Wall Break", cd: 90, mult: 550, col:"#fefce8", log:"The code itself attacks them!"} },
+  { name: "Limitless (Gojo)", rarity: "Secret", dmgBuff: 250.0, chance: 0.001, skill1: {n:"Cursed Reversal: Red", cd: 5, mult: 40, col:"#ff1a1a", log:"Red blasts them away!"}, skill2: {n:"Domain: Unlimited Void", cd: 30, mult: 150, col:"#66ccff", log:"Unlimited Void paralyzes them!"}, skill3: {n:"Cursed Technique: Blue", cd: 8, mult: 80, col:"#0073e6", log:"Blue crushes their atoms!"}, skill4: {n:"Infinity Burst", cd: 15, mult: 100, col:"#cc99ff", log:"Infinity expands violently!"}, skill5: {n:"Hollow Purple", cd: 45, mult: 450, col:"#9900ff", log:"Imaginary mass erases reality!"}, skill6: {n:"200% Hollow Purple", cd: 100, mult: 1250, col:"#ff66ff", log:"An unrestricted nuke of Purple!"} },
   { name: "Modulo (Itadori) <img src='itadori.png' style='width:24px;height:24px;vertical-align:middle;border-radius:5px;border:1px solid rgba(255,153,153,0.6);'>", rarity: "The Strongest Sorcerer", dmgBuff: 300.0, chance: 0, skill1: {n:"Black Flash Barrage", cd: 4, mult: 100, col:"#ff9999", log:"Black Sparks constantly flash!"}, skill2: {n:"Soul Dismantle", cd: 25, mult: 600, col:"#ffcccc", log:"Their soul is completely severed!"}, skill3: {n:"Divergent Fist", cd: 8, mult: 160, col:"#ffb3b3", log:"A delayed impact strikes internally!"}, skill4: {n:"Manji Kick", cd: 15, mult: 240, col:"#ffe6e6", log:"A perfect martial arts kick!"}, skill5: {n:"Piercing Blood", cd: 20, mult: 400, col:"#ffcccc", log:"A lethal beam of blood!"}, skill6: {n:"Secret Domain: Benevolent Shrine", cd: 80, mult: 2000, col:"#ffffff", log:"True salvation obliterates unconditionally!"} },
-  { name: "True Form (Sukuna)", rarity: "Secret", dmgBuff: 250.0, chance: 0.00002, skill1: {n:"Four-Armed Suppression", cd: 5, mult: 60, col:"#ff4d4d", log:"Overwhelming physical combat superiority!"}, skill2: {n:"Kamutoke Lightning", cd: 12, mult: 100, col:"#ffcc00", log:"Kamutoke strikes them with raw lightning!"}, skill3: {n:"Chanted Dismantle", cd: 20, mult: 180, col:"#ffb3b3", log:"Scale of the dragon, recoil, twin meteors!"}, skill4: {n:"Hollow Wicker Basket", cd: 40, mult: 250, col:"#e6e6e6", log:"Two hands weave defense while the others attack!"}, skill5: {n:"Domain: Open Barrier Shrine", cd: 75, mult: 400, col:"#ff0000", log:"A divine, unclosed domain completely disintegrates them!"}, skill6: {n:"World Cutting Slash", cd: 130, mult: 1200, col:"#ffffff", log:"You cut the very fabric of the world itself!"} }
+  { name: "True Form (Sukuna)", rarity: "Secret", dmgBuff: 250.0, chance: 0.001, skill1: {n:"Four-Armed Suppression", cd: 5, mult: 60, col:"#ff4d4d", log:"Overwhelming physical combat superiority!"}, skill2: {n:"Kamutoke Lightning", cd: 12, mult: 100, col:"#ffcc00", log:"Kamutoke strikes them with raw lightning!"}, skill3: {n:"Chanted Dismantle", cd: 20, mult: 180, col:"#ffb3b3", log:"Scale of the dragon, recoil, twin meteors!"}, skill4: {n:"Hollow Wicker Basket", cd: 40, mult: 250, col:"#e6e6e6", log:"Two hands weave defense while the others attack!"}, skill5: {n:"Domain: Open Barrier Shrine", cd: 75, mult: 400, col:"#ff0000", log:"A divine, unclosed domain completely disintegrates them!"}, skill6: {n:"World Cutting Slash", cd: 130, mult: 1200, col:"#ffffff", log:"You cut the very fabric of the world itself!"} }
 ];
 
 const weapons = [
-  { name: "Rusty Knife", rarity: "Common", dmgBonus: 1, chance: 0.45, wSkill: {n:"Shank", cd:6, mult:2, log:"A rusty shank cuts deep!"} },
-  { name: "Wooden Bokken", rarity: "Common", dmgBonus: 3, chance: 0.30, wSkill: {n:"Wood Strike", cd:6, mult:3, log:"Bokken slash!"} },
+  { name: "Rusty Knife", rarity: "Common", dmgBonus: 1, chance: 0.16, wSkill: {n:"Shank", cd:6, mult:2, log:"A rusty shank cuts deep!"} },
+  { name: "Wooden Bokken", rarity: "Common", dmgBonus: 3, chance: 0.16, wSkill: {n:"Wood Strike", cd:6, mult:3, log:"Bokken slash!"} },
   { name: "Cursed Katana", rarity: "Rare", dmgBonus: 6, chance: 0.15, wSkill: {n:"Iaido", cd:10, mult:5, log:"A clean sword draw!"} },
-  { name: "Handgun", rarity: "Rare", dmgBonus: 12, chance: 0.08, wSkill: {n:"Cursed Bullet", cd:4, mult:4, log:"BANG!"} },
-  { name: "Slaughter Demon", rarity: "Epic", dmgBonus: 25, chance: 0.012, wSkill: {n:"Demon Cleave", cd:15, mult:10, log:"Slaughtering slash!"} },
-  { name: "Jet Black Blade", rarity: "Epic", dmgBonus: 40, chance: 0.005, wSkill: {n:"Shadow Slash", cd:15, mult:15, log:"A dark slash cuts reality!"} },
-  { name: "Playful Cloud", rarity: "Legendary", dmgBonus: 80, chance: 0.0019, wSkill: {n:"Tri-Staff Beatdown", cd:20, mult:25, log:"The legendary staff crushes!"} },
-  { name: "Split Soul Katana", rarity: "Legendary", dmgBonus: 120, chance: 0.0007, wSkill: {n:"Soul Sever", cd:30, mult:40, log:"Their raw soul is cut entirely!"} },
-  { name: "Executioner's Sword", rarity: "Mythic", dmgBonus: 300, chance: 0.0003, wSkill: {n:"Judgement", cd:50, mult:100, log:"GUILTY! Instant destruction!"} },
-  { name: "Inverted Spear of Heaven", rarity: "Mythic", dmgBonus: 500, chance: 0.0001, wSkill: {n:"Technique Nullification", cd:60, mult:150, log:"Cursed techniques are shattered!"} },
-  { name: "Split Soul Katana (Awakened)", rarity: "Secret", dmgBonus: 1500, chance: 0.00005, wSkill: {n:"Absolute Soul Sever", cd:40, mult:800, log:"Their very existence is split open!"} },
-  { name: "Kamutoke (True Version)", rarity: "Secret", dmgBonus: 2000, chance: 0.00002, wSkill: {n:"Divine Thunderburst", cd:20, mult:400, log:"Raw lightning falls from the heavens!"} }
+  { name: "Handgun", rarity: "Rare", dmgBonus: 12, chance: 0.15, wSkill: {n:"Cursed Bullet", cd:4, mult:4, log:"BANG!"} },
+  { name: "Slaughter Demon", rarity: "Epic", dmgBonus: 25, chance: 0.13775, wSkill: {n:"Demon Cleave", cd:15, mult:10, log:"Slaughtering slash!"} },
+  { name: "Jet Black Blade", rarity: "Epic", dmgBonus: 40, chance: 0.13775, wSkill: {n:"Shadow Slash", cd:15, mult:15, log:"A dark slash cuts reality!"} },
+  { name: "Playful Cloud", rarity: "Legendary", dmgBonus: 80, chance: 0.03, wSkill: {n:"Tri-Staff Beatdown", cd:20, mult:25, log:"The legendary staff crushes!"} },
+  { name: "Split Soul Katana", rarity: "Legendary", dmgBonus: 120, chance: 0.04, wSkill: {n:"Soul Sever", cd:30, mult:40, log:"Their raw soul is cut entirely!"} },
+  { name: "Executioner's Sword", rarity: "Mythic", dmgBonus: 300, chance: 0.015, wSkill: {n:"Judgement", cd:50, mult:100, log:"GUILTY! Instant destruction!"} },
+  { name: "Inverted Spear of Heaven", rarity: "Mythic", dmgBonus: 500, chance: 0.0175, wSkill: {n:"Technique Nullification", cd:60, mult:150, log:"Cursed techniques are shattered!"} },
+  { name: "Split Soul Katana (Awakened)", rarity: "Secret", dmgBonus: 1500, chance: 0.001, wSkill: {n:"Absolute Soul Sever", cd:40, mult:800, log:"Their very existence is split open!"} },
+  { name: "Kamutoke (True Version)", rarity: "Secret", dmgBonus: 2000, chance: 0.001, wSkill: {n:"Divine Thunderburst", cd:20, mult:400, log:"Raw lightning falls from the heavens!"} }
 ];
 
 const traits = [
-  { name: "Nimble", rarity: "Common", dmgBuff: 0, hpBuff: 0.1, chance: 0.40, desc: "+10% Max HP." },
-  { name: "Sturdy", rarity: "Common", dmgBuff: 0, hpBuff: 0.2, chance: 0.25, desc: "+20% Max HP." },
-  { name: "Cursed", rarity: "Rare", dmgBuff: 0.2, hpBuff: 0.2, chance: 0.18, desc: "+20% Base DMG, +20% Max HP." },
-  { name: "Fierce", rarity: "Rare", dmgBuff: 0.4, hpBuff: 0, chance: 0.08, desc: "+40% Base DMG." },
-  { name: "Resilient", rarity: "Epic", dmgBuff: 3.5, hpBuff: 0.6, chance: 0.05, desc: "+350% Base DMG, +60% Max HP." },
-  { name: "Unbreakable", rarity: "Epic", dmgBuff: 0.2, hpBuff: 3.0, chance: 0.025, desc: "Massive +300% Max HP." },
-  { name: "Fortune", rarity: "Legendary", dmgBuff: 8.0, hpBuff: 0.25, chance: 0.01, desc: "Triples all Yen drops! +800% Base DMG." },
-  { name: "Ruthless", rarity: "Legendary", dmgBuff: 12.0, hpBuff: 0, chance: 0.004, desc: "+1,200% Base DMG." },
-  { name: "Heavenly Restricted", rarity: "Mythic", dmgBuff: 35.0, hpBuff: 15.0, chance: 0.0005, desc: "+3,500% Base DMG, +1500% HP. CE Mult Disabled." },
-  { name: "Monarch", rarity: "Mythic", dmgBuff: 15.0, hpBuff: 5.0, chance: 0.0003, desc: "+1,500% DMG, +500% HP. Snowball scaling." },
-  { name: "The Six Eyes", rarity: "Mythic", dmgBuff: 45.0, hpBuff: 10.0, chance: 0.0002, desc: "Unrivaled perception. +4,500% Base DMG, halves CDs." },
-  { name: "The Honored One", rarity: "Secret", dmgBuff: 150.0, hpBuff: 50.0, chance: 0.00005, desc: "Immune to Vow penalties! +15,000% DMG." },
-  { name: "The Disgraced One", rarity: "Secret", dmgBuff: 250.0, hpBuff: -0.5, chance: 0.00002, desc: "+25,000% Base DMG, but Max HP is severely slashed." }
+  { name: "Nimble", rarity: "Common", dmgBuff: 0, hpBuff: 0.1, chance: 0.15, desc: "+10% Max HP." },
+  { name: "Sturdy", rarity: "Common", dmgBuff: 0, hpBuff: 0.2, chance: 0.14, desc: "+20% Max HP." },
+  { name: "Cursed", rarity: "Rare", dmgBuff: 0.2, hpBuff: 0.2, chance: 0.12, desc: "+20% Base DMG, +20% Max HP." },
+  { name: "Fierce", rarity: "Rare", dmgBuff: 0.4, hpBuff: 0, chance: 0.12, desc: "+40% Base DMG." },
+  { name: "Resilient", rarity: "Epic", dmgBuff: 3.5, hpBuff: 0.6, chance: 0.179, desc: "+350% Base DMG, +60% Max HP." },
+  { name: "Unbreakable", rarity: "Epic", dmgBuff: 0.2, hpBuff: 3.0, chance: 0.179, desc: "Massive +300% Max HP." },
+  { name: "Fortune", rarity: "Legendary", dmgBuff: 8.0, hpBuff: 0.25, chance: 0.025, desc: "Triples all Yen drops! +800% Base DMG." },
+  { name: "Ruthless", rarity: "Legendary", dmgBuff: 12.0, hpBuff: 0, chance: 0.04, desc: "+1,200% Base DMG." },
+  { name: "Heavenly Restricted", rarity: "Mythic", dmgBuff: 35.0, hpBuff: 15.0, chance: 0.012, desc: "+3,500% Base DMG, +1500% HP. CE Mult Disabled." },
+  { name: "Monarch", rarity: "Mythic", dmgBuff: 15.0, hpBuff: 5.0, chance: 0.015, desc: "+1,500% DMG, +500% HP. Snowball scaling." },
+  { name: "The Six Eyes", rarity: "Mythic", dmgBuff: 45.0, hpBuff: 10.0, chance: 0.018, desc: "Unrivaled perception. +4,500% Base DMG, halves CDs." },
+  { name: "The Honored One", rarity: "Secret", dmgBuff: 150.0, hpBuff: 50.0, chance: 0.001, desc: "Immune to Vow penalties! +15,000% DMG." },
+  { name: "The Disgraced One", rarity: "Secret", dmgBuff: 250.0, hpBuff: -0.5, chance: 0.001, desc: "+25,000% Base DMG, but Max HP is severely slashed." }
 ];
 
 const clansArray = [
-  { name: "Civilian", rarity: "Common", dmgBuff: 0, hpBuff: 0, chance: 0.45 },
-  { name: "Minor Sorcerer Family", rarity: "Common", dmgBuff: 0.05, hpBuff: 0.05, chance: 0.20 },
-  { name: "Inumaki Clan", rarity: "Rare", dmgBuff: 0.1, hpBuff: 0.1, chance: 0.15 },
-  { name: "Gakuganji Clan", rarity: "Rare", dmgBuff: 0.2, hpBuff: 0.05, chance: 0.08 },
-  { name: "Kamo Clan", rarity: "Epic", dmgBuff: 1.5, hpBuff: 1.5, chance: 0.07 },
-  { name: "Fushiguro Family", rarity: "Epic", dmgBuff: 2.5, hpBuff: 0.8, chance: 0.035 },
-  { name: "Zenin Clan", rarity: "Legendary", dmgBuff: 8.0, hpBuff: 1.0, chance: 0.01 },
-  { name: "Itadori Family", rarity: "Legendary", dmgBuff: 3.0, hpBuff: 5.5, chance: 0.004 },
-  { name: "Gojo Clan", rarity: "Mythic", dmgBuff: 30.0, hpBuff: 15.0, chance: 0.0006 },
-  { name: "Sugawara Clan", rarity: "Mythic", dmgBuff: 35.0, hpBuff: 8.0, chance: 0.0003 },
-  { name: "Fujiwara Clan", rarity: "Mythic", dmgBuff: 20.0, hpBuff: 20.0, chance: 0.0001 },
-  { name: "The Ryomen Bloodline", rarity: "Secret", dmgBuff: 150.0, hpBuff: 50.0, chance: 0.00005 }
+  { name: "Civilian", rarity: "Common", dmgBuff: 0, hpBuff: 0, chance: 0.15 },
+  { name: "Minor Sorcerer Family", rarity: "Common", dmgBuff: 0.05, hpBuff: 0.05, chance: 0.14 },
+  { name: "Inumaki Clan", rarity: "Rare", dmgBuff: 0.1, hpBuff: 0.1, chance: 0.11 },
+  { name: "Gakuganji Clan", rarity: "Rare", dmgBuff: 0.2, hpBuff: 0.05, chance: 0.11 },
+  { name: "Kamo Clan", rarity: "Epic", dmgBuff: 1.5, hpBuff: 1.5, chance: 0.1845 },
+  { name: "Fushiguro Family", rarity: "Epic", dmgBuff: 2.5, hpBuff: 0.8, chance: 0.1845 },
+  { name: "Zenin Clan", rarity: "Legendary", dmgBuff: 8.0, hpBuff: 1.0, chance: 0.03 },
+  { name: "Itadori Family", rarity: "Legendary", dmgBuff: 3.0, hpBuff: 5.5, chance: 0.045 },
+  { name: "Gojo Clan", rarity: "Mythic", dmgBuff: 30.0, hpBuff: 15.0, chance: 0.012 },
+  { name: "Sugawara Clan", rarity: "Mythic", dmgBuff: 35.0, hpBuff: 8.0, chance: 0.015 },
+  { name: "Fujiwara Clan", rarity: "Mythic", dmgBuff: 20.0, hpBuff: 20.0, chance: 0.018 },
+  { name: "The Ryomen Bloodline", rarity: "Secret", dmgBuff: 150.0, hpBuff: 50.0, chance: 0.001 }
 ];
 
 const memorias = {
@@ -597,9 +702,10 @@ function renderMemoriaInventory() {
   let html = "";
   if (!gameState.memoria) gameState.memoria = [];
   gameState.memoria.forEach(m => {
-    let col = m.rarity === 'Vanguard' ? '#00aaff' : m.rarity === 'Godly' ? '#ffaa00' : '#ff00ff';
+    let col = m.rarity === 'Vanguard' ? '#4f46e5' : m.rarity === 'Godly' ? '#facc15' : '#d946ef';
+    let titleClass = m.rarity === 'Vanguard' ? 'text-memoria-vanguard' : m.rarity === 'Godly' ? 'text-memoria-godly' : 'text-memoria-cosmic';
     html += `<div class="memoria-card" style="border-color:${col};">
-       <h3 style="color:${col}; margin-top:0;">${m.name} [${m.rarity}]</h3>
+       <h3 class="${titleClass}" style="margin-top:0;">${m.name} <span style="font-size:0.85em; opacity:0.9;">[${m.rarity}]</span></h3>
        <p style="color:#ccc; font-size:14px;">${m.desc}</p>
     </div>`;
   });
@@ -753,11 +859,41 @@ const DOM = {
   awakenBtn: document.getElementById('tss-awaken-btn'), awakenTssBtn: document.getElementById('awakenTssBtn')
 };
 
+/** Avoid rewriting equip/inventory HTML every tick so gradient text animations stay continuous. */
+let _lastEquipBlockSig = '';
+let _lastInventorySig = '';
+let _lastPitySig = '';
+
+function getEquipBlockSig() {
+  return [
+    gameState.technique ? `${gameState.technique.name}|${gameState.technique.level || 1}|${gameState.technique.rarity}` : '',
+    gameState.weapon ? `${gameState.weapon.name}|${gameState.weapon.level || 1}` : '',
+    gameState.trait ? `${gameState.trait.name}|${gameState.monarchStacks || 0}` : '',
+    gameState.clan ? `${gameState.clan.name}|${gameState.clan.level || 1}` : ''
+  ].join('#');
+}
+
+function getInventoryListSig() {
+  try {
+    return JSON.stringify(gameState.inventory) + '#' + getEquipBlockSig();
+  } catch (e) {
+    return String(Math.random());
+  }
+}
+
+function getPitySig() {
+  return ['technique', 'weapon', 'trait', 'clan'].map(t => {
+    const p = gameState.pity[t];
+    return `${p.l}|${p.m}|${p.s === undefined ? 0 : p.s}`;
+  }).join(';');
+}
+
 const allyUIElements = {}; 
 
 function initGame() {
   loadGame();
-  
+  clampBossLevel();
+
   // Quick migration for old saves
   ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
     if (gameState[t] && !gameState.inventory[t].find(i => i.name === gameState[t].name)) {
@@ -777,7 +913,8 @@ function initGame() {
     document.getElementById('alliesContainer').appendChild(div);
     allyUIElements[key] = { card: div, owned: document.getElementById(`${key}-owned`), cost: document.getElementById(`${key}-cost`), btn: document.getElementById(`buy-${key}`) };
   }
-  populateChances('tech-chances', techniques); populateChances('weapon-chances', weapons); populateChances('trait-chances', traits); populateChances('clan-chances', clansArray);
+  populateChances('tech-chances', techniques, (i) => getTechniqueRarityClass(i));
+  populateChances('weapon-chances', weapons); populateChances('trait-chances', traits); populateChances('clan-chances', clansArray);
 
   recalc();
   
@@ -837,9 +974,10 @@ function toggleAFK(mode) {
   updateUI();
 }
 
+/** Boss / raid / culling enemies reduce incoming damage by 1.05^bossLevel (intentional — scales with your Boss Lv.). Safe-area mobs: no mitigation. */
 function getEnemyMitigation() {
    if (!gameState.enemy || gameState.enemy.type === 'normal') return 1.0;
-   return Math.pow(1.05, gameState.bossLevel);
+   return Math.pow(1.05, Math.min(gameState.bossLevel, MAX_BOSS_LEVEL));
 }
 
 function getBodyTrainCost() {
@@ -872,8 +1010,29 @@ function getGachaCost(type) {
   let gradeMult = gameState.grade === 4 ? 1 : gameState.grade === 3 ? 10 : gameState.grade === 2 ? 50 : 200;
   return base * gradeMult;
 }
-function rollItem(arr) { let r = Math.random(), sum = 0; for (let i of arr) { sum += i.chance; if (r <= sum) return i; } return arr[0]; }
-function populateChances(eid, arr) { document.getElementById(eid).innerHTML = arr.filter(i => i.chance > 0).map(i => `<p><span class="${rarities[i.rarity].class}">${i.name}</span> <span>${(i.chance * 100).toFixed(3).replace(/\.?0+$/, '')}%</span></p>`).join(''); }
+/** Weighted pick; weights need not sum to 1. Items with chance 0 are never rolled. */
+function rollItem(arr) {
+  let total = 0;
+  for (let i of arr) total += (i.chance || 0);
+  if (total <= 0) return arr[0];
+  let r = Math.random() * total;
+  let sum = 0;
+  for (let i of arr) {
+    sum += (i.chance || 0);
+    if (r <= sum) return i;
+  }
+  return arr[arr.length - 1];
+}
+function populateChances(eid, arr, getClassFn) {
+  const gc = getClassFn || ((item) => rarities[item.rarity].class);
+  const pool = arr.filter(i => i.chance > 0);
+  const total = pool.reduce((s, i) => s + i.chance, 0);
+  document.getElementById(eid).innerHTML = pool.map(i => {
+    const pct = total > 0 ? (i.chance / total) * 100 : 0;
+    const pctStr = pct >= 0.1 ? pct.toFixed(2).replace(/\.?0+$/, '') : pct.toFixed(3).replace(/\.?0+$/, '');
+    return `<p><span class="${gc(i)}">${i.name}</span> <span>${pctStr}%</span></p>`;
+  }).join('');
+}
 function switchGacha(t) { document.querySelectorAll('.gacha-tab, .gacha-content').forEach(el => el.classList.remove('active')); event.target.classList.add('active'); document.getElementById(`gacha-${t}`).classList.add('active'); }
 
 // Combat Skills UI
@@ -1368,7 +1527,7 @@ function startCullingGames() {
     // Weak Generic Player (60% chance)
     let weakNames = ["Tokyo Colony Player", "Sendai Colony Player", "Tokyo No.2 Player", "Sakurajima Colony Player", "Awakened Non-Sorcerer"];
     let wName = weakNames[Math.floor(Math.random() * weakNames.length)];
-    let weakHp = 5000000 * Math.pow(1.2, gameState.bossLevel) * (1 + (gameState.bossLevel * 0.3));
+    let weakHp = 5000000 * scalingFactor;
     gameState.enemy = {
       name: wName + " (Culling Player)", hp: weakHp, maxHp: weakHp, type: "culling",
       mechanic: null,
@@ -1404,7 +1563,7 @@ function defeatEnemy() {
   if (gameState.isCullingGame) {
      gameState.stats.cullingDefeated = (gameState.stats.cullingDefeated || 0) + 1;
      gameState.cullingPoints++;
-     gameState.bossLevel++;
+     gameState.bossLevel = Math.min(MAX_BOSS_LEVEL, gameState.bossLevel + 1);
      gameState.isCullingGame = false;
      updateLog("Won Culling Game! +1 GP", "sys");
      spawnEnemy(false);
@@ -1424,7 +1583,7 @@ function defeatEnemy() {
      spawnEnemy(false);
   } else if (gameState.isBossFight) {
     gameState.stats.bossesDefeated++;
-    gameState.bossLevel++;
+    gameState.bossLevel = Math.min(MAX_BOSS_LEVEL, gameState.bossLevel + 1);
     if (gameState.trait && gameState.trait.name === "Monarch") gameState.monarchStacks += 1;
     gameState.activeVow = null; document.querySelectorAll('.vow-btn').forEach(el => el.classList.remove('active'));
     spawnEnemy(false);
@@ -1733,6 +1892,14 @@ function prestige() {
 
 // ===== RENDER =====
 function updateUI() {
+  ['boss','culling','raid'].forEach(m => {
+    let btn = document.getElementById('afk' + m.charAt(0).toUpperCase() + m.slice(1));
+    if (btn) {
+       if (gameState.afkMode === m) { btn.style.background = '#004d00'; btn.style.color = '#00ff00'; btn.style.borderColor = '#00ff00'; }
+       else { btn.style.background = '#222'; btn.style.color = '#aaa'; btn.style.borderColor = '#444'; }
+    }
+  });
+
   DOM.yen.innerText = formatNumber(gameState.yen); DOM.energy.innerText = formatNumber(gameState.cursedEnergy);
   DOM.cePowerMultiplier.innerText = formatNumber((getCEPowerMultiplier() - 1) * 100);
   DOM.sec.innerText = formatNumber(gameState.yenPerSec); DOM.dmg.innerText = formatNumber(gameState.playerDamage);
@@ -1776,23 +1943,36 @@ function updateUI() {
   DOM.trainBodyCost.innerText = formatNumber(getBodyTrainCost());
   DOM.trainBodyBtn.disabled = gameState.yen < getBodyTrainCost();
 
-  DOM.tech.innerHTML = gameState.technique ? `<span class="${rarities[gameState.technique.rarity].class}">${gameState.technique.name} [Lv.${gameState.technique.level || 1}]</span>` : "None";
-  if (gameState.technique) {
-     DOM.techDesc.style.display = "block";
-     DOM.techDesc.innerHTML = `<span style="color:#fff;">[${gameState.technique.rarity}]</span> +${formatNumber(gameState.technique.dmgBuff*100)}% Base DMG. <br>• ${gameState.technique.skill1.n} (CD: ${gameState.technique.skill1.cd}s)<br>• ${gameState.technique.skill2.n} (CD: ${gameState.technique.skill2.cd}s)`;
-  } else DOM.techDesc.style.display = "none";
+  const equipSig = getEquipBlockSig();
+  if (equipSig !== _lastEquipBlockSig) {
+    _lastEquipBlockSig = equipSig;
+    DOM.tech.innerHTML = gameState.technique ? `<span class="${getTechniqueRarityClass(gameState.technique)}">${gameState.technique.name} [Lv.${gameState.technique.level || 1}]</span>` : "None";
+    if (gameState.technique) {
+       DOM.techDesc.style.display = "block";
+       DOM.techDesc.innerHTML = `<span style="color:#fff;">[${gameState.technique.rarity}]</span> +${formatNumber(gameState.technique.dmgBuff*100)}% Base DMG. <br>• ${gameState.technique.skill1.n} (CD: ${gameState.technique.skill1.cd}s)<br>• ${gameState.technique.skill2.n} (CD: ${gameState.technique.skill2.cd}s)`;
+    } else DOM.techDesc.style.display = "none";
 
-  DOM.weapon.innerHTML = gameState.weapon ? `<span class="${rarities[gameState.weapon.rarity].class}">${gameState.weapon.name} [Lv.${gameState.weapon.level || 1}]</span>` : "None";
-  if (gameState.weapon) {
-     DOM.weapDesc.style.display = "block";
-     DOM.weapDesc.innerHTML = `<span style="color:#fff;">[${gameState.weapon.rarity}]</span> Flat +${formatNumber(gameState.weapon.dmgBonus)} Base DMG.`;
-  } else DOM.weapDesc.style.display = "none";
+    DOM.weapon.innerHTML = gameState.weapon ? `<span class="${rarities[gameState.weapon.rarity].class}">${gameState.weapon.name} [Lv.${gameState.weapon.level || 1}]</span>` : "None";
+    if (gameState.weapon) {
+       DOM.weapDesc.style.display = "block";
+       DOM.weapDesc.innerHTML = `<span style="color:#fff;">[${gameState.weapon.rarity}]</span> Flat +${formatNumber(gameState.weapon.dmgBonus)} Base DMG.`;
+    } else DOM.weapDesc.style.display = "none";
 
-  DOM.clan.innerHTML = gameState.clan ? `<span class="${rarities[gameState.clan.rarity].class}">${gameState.clan.name} [Lv.${gameState.clan.level || 1}]</span>` : "None";
-  if (gameState.clan) {
-     DOM.clanDesc.style.display = "block";
-     DOM.clanDesc.innerHTML = `<span style="color:#fff;">[${gameState.clan.rarity}]</span> +${formatNumber(gameState.clan.dmgBuff*100)}% DMG, +${formatNumber(gameState.clan.hpBuff*100)}% Max HP.`;
-  } else DOM.clanDesc.style.display = "none";
+    DOM.clan.innerHTML = gameState.clan ? `<span class="${rarities[gameState.clan.rarity].class}">${gameState.clan.name} [Lv.${gameState.clan.level || 1}]</span>` : "None";
+    if (gameState.clan) {
+       DOM.clanDesc.style.display = "block";
+       DOM.clanDesc.innerHTML = `<span style="color:#fff;">[${gameState.clan.rarity}]</span> +${formatNumber(gameState.clan.dmgBuff*100)}% DMG, +${formatNumber(gameState.clan.hpBuff*100)}% Max HP.`;
+    } else DOM.clanDesc.style.display = "none";
+
+    if (gameState.trait) {
+      let extra = gameState.trait.name === "Monarch" ? ` <span style="font-size:10px; color:#ffcc00;">[Stacks: ${gameState.monarchStacks}]</span>` : "";
+      DOM.trait.innerHTML = `<span class="${rarities[gameState.trait.rarity].class}">${gameState.trait.name}</span>` + extra;
+      DOM.traitDesc.innerHTML = `<span style="color:#fff;">[${gameState.trait.rarity}]</span> ` + gameState.trait.desc;
+    } else {
+      DOM.trait.innerHTML = "None";
+      DOM.traitDesc.innerHTML = "No trait active. Spin to alter your fate.";
+    }
+  }
 
   let memBtn = document.getElementById('memoriaHubBtn');
   if (memBtn) memBtn.style.display = (gameState.sukunaFingers > 0 || (gameState.rebirths || 0) > 0 || (gameState.memoriaShards || 0) > 0) ? "block" : "none";
@@ -1821,23 +2001,18 @@ function updateUI() {
        } else btn.style.display = "none";
      }
   });
-  
-  if (gameState.trait) {
-    let extra = gameState.trait.name === "Monarch" ? ` <span style="font-size:10px; color:#ffcc00;">[Stacks: ${gameState.monarchStacks}]</span>` : "";
-    DOM.trait.innerHTML = `<span class="${rarities[gameState.trait.rarity].class}">${gameState.trait.name}</span>` + extra;
-    DOM.traitDesc.innerHTML = `<span style="color:#fff;">[${gameState.trait.rarity}]</span> ` + gameState.trait.desc;
-  } else {
-    DOM.trait.innerHTML = "None"; DOM.traitDesc.innerHTML = "No trait active. Spin to alter your fate.";
-  }
 
-  // Render Pity UI
-  ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
-    let el = document.getElementById(`pity-${t}`);
-    if (el) {
-      let sPity = gameState.pity[t].s === undefined ? 0 : gameState.pity[t].s;
-      el.innerHTML = `Leg: <span style="color:#ffcc00;">${gameState.pity[t].l}/200</span> | Mythic: <span style="color:#ff3333;">${gameState.pity[t].m}/400</span> | Sec: <span class="text-secret" style="font-size:10px;">${sPity}/2500</span>`;
-    }
-  });
+  const pitySig = getPitySig();
+  if (pitySig !== _lastPitySig) {
+    _lastPitySig = pitySig;
+    ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
+      let el = document.getElementById(`pity-${t}`);
+      if (el) {
+        let sPity = gameState.pity[t].s === undefined ? 0 : gameState.pity[t].s;
+        el.innerHTML = `Leg: <span style="color:#ffcc00;">${gameState.pity[t].l}/200</span> | Mythic: <span style="color:#ff3333;">${gameState.pity[t].m}/400</span> | Sec: <span class="text-secret" style="font-size:10px;">${sPity}/2500</span>`;
+      }
+    });
+  }
 
   if (gameState.enemy) {
     if (gameState.enemy.type === 'normal') {
@@ -1875,7 +2050,7 @@ function updateUI() {
   } else { 
      DOM.prestigeBtn.innerText = `Cursed Cycle Reset (Req: ¥${formatNumber(rebirthReq)})`; 
      DOM.prestigeBtn.disabled = y < rebirthReq; 
-     DOM.prestigeBtn.onclick = () => rebirthPrestige();
+     DOM.prestigeBtn.onclick = () => prestige();
      DOM.prestigeBtn.style.background = "linear-gradient(45deg, #000, #ff0000)";
      DOM.prestigeBtn.style.border = "1px solid #ff0000";
   }
@@ -1908,24 +2083,27 @@ function updateUI() {
     DOM.rctBtn.disabled = gameState.cursedEnergy < ceCost || gameState.playerHp >= gameState.playerMaxHp;
   }
 
-  let invHtml = '';
-  // Dictionary to label categories
-  const catNames = { 'technique': 'Techniques', 'weapon': 'Weapons', 'trait': 'Traits', 'clan': 'Bloodlines' };
-  
-  ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
-     if (gameState.inventory[t] && gameState.inventory[t].length > 0) {
-       invHtml += `<div class="inv-category">${catNames[t]}</div>`;
-       gameState.inventory[t].forEach(item => {
-          let isEquipped = gameState[t] && gameState[t].name === item.name;
-          invHtml += `<button onclick="equipItem('${t}', '${item.name.replace(/'/g, "\\'")}')" style="font-size:11px; padding:4px 6px; margin:2px; background:${isEquipped ? 'var(--accent)' : '#2a2a35'}; border: 1px solid ${isEquipped ? '#fff' : '#444'};">
-            <span class="${rarities[item.rarity].class}">${item.name}</span>
-          </button>`;
-       });
-     }
-  });
-  if (invHtml === '') invHtml = '<span style="font-size:11px; color:#666;">Inventory is empty. Spin Gacha!</span>';
-  let invList = document.getElementById('inventory-list');
-  if (invList) invList.innerHTML = invHtml;
+  const invSig = getInventoryListSig();
+  if (invSig !== _lastInventorySig) {
+    _lastInventorySig = invSig;
+    let invHtml = '';
+    const catNames = { 'technique': 'Techniques', 'weapon': 'Weapons', 'trait': 'Traits', 'clan': 'Bloodlines' };
+    ['technique', 'weapon', 'trait', 'clan'].forEach(t => {
+       if (gameState.inventory[t] && gameState.inventory[t].length > 0) {
+         invHtml += `<div class="inv-category">${catNames[t]}</div>`;
+         gameState.inventory[t].forEach(item => {
+            let isEquipped = gameState[t] && gameState[t].name === item.name;
+            let spanClass = t === 'technique' ? getTechniqueRarityClass(item) : rarities[item.rarity].class;
+            invHtml += `<button onclick="equipItem('${t}', '${item.name.replace(/'/g, "\\'")}')" style="font-size:11px; padding:4px 6px; margin:2px; background:${isEquipped ? 'var(--accent)' : '#2a2a35'}; border: 1px solid ${isEquipped ? '#fff' : '#444'};">
+              <span class="${spanClass}">${item.name}</span>
+            </button>`;
+         });
+       }
+    });
+    if (invHtml === '') invHtml = '<span style="font-size:11px; color:#666;">Inventory is empty. Spin Gacha!</span>';
+    let invList = document.getElementById('inventory-list');
+    if (invList) invList.innerHTML = invHtml;
+  }
 }
 
 // ===== TSS QUESTLINE =====
@@ -2011,7 +2189,8 @@ function loadGame() {
     if (saved) {
       let p = JSON.parse(saved);
       gameState.yen = p.yen || 0; gameState.cursedEnergy = p.cursedEnergy || 0;
-      gameState.monarchStacks = p.monarchStacks || 0; gameState.bossLevel = p.bossLevel || 0;
+      gameState.monarchStacks = p.monarchStacks || 0;
+      gameState.bossLevel = Math.min(MAX_BOSS_LEVEL, p.bossLevel || 0);
       gameState.bodyTrainingLevel = p.bodyTrainingLevel || 0;
       gameState.grade = p.grade || 4;
       gameState.sorcererType = p.sorcererType || null; 
@@ -2103,6 +2282,8 @@ function loadGame() {
       gameState.memoriaShards = p.memoriaShards || 0;
       gameState.memoria = p.memoria || [];
       gameState.rebirths = p.rebirths || 0;
+      // Heal saves where Special Grade used rebirthPrestige (rebirths counted, Sukuna Fingers did not).
+      if (gameState.rebirths > gameState.sukunaFingers) gameState.sukunaFingers = gameState.rebirths;
       gameState.comboDriveStacks = p.comboDriveStacks || 0;
       gameState.flowingForceClicks = p.flowingForceClicks || 0;
       gameState.gpShop = p.gpShop || {};
@@ -2114,3 +2295,4 @@ window.onload = initGame;
 </script>
 </body>
 </html>
+
